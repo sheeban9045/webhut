@@ -1,0 +1,207 @@
+
+
+.login {
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+    margin: 0 auto;
+    width: 50%;
+    background: #fff;
+    box-shadow: 0 5px 30px rgb(0 0 0 / 25%);
+    min-height: 450px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.login .col-md-6{
+	padding-right: 0px;
+	padding-left: 0px;
+}
+
+
+
+
+.login-page {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    padding: 30px 40px;
+    font-family: "Roboto",sans-serif;
+    color: #fff;
+    background-image: url(../../images/login-bg.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius:10px;
+
+}
+.login-page h1 {
+    margin-top: 0;
+    font-weight: 500;
+    font-size: 40px;
+    margin-bottom: 7px;
+}
+
+.login-page p {
+    font-size: 16px;
+    margin-bottom: 50px;
+}
+.social_btns p {
+    margin-bottom: 5px;
+}
+
+.social_btns a {
+    text-decoration: none;
+    width: 39px;
+    height: 39px;
+    margin: 0 5px 0 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 20%);
+    transition: all .2s ease;
+    padding: 8px;       
+     margin-top: 6px;
+}
+
+.btn-facebook {
+    color: #fff;
+    background-color: #3b5998;
+    border-color: rgba(0,0,0,.2);
+}
+
+.btn-linkedin {
+    color: #fff;
+    background-color: #007bb6;
+    border-color: rgba(0,0,0,.2);
+}
+
+.btn-instagram {
+    color: #fff;
+    background-color: #833AB4;;
+    border-color: rgba(0,0,0,.2);
+}
+
+.btn-twiter {
+	color: #fff;
+    background-color: #1DA1F2;
+    border-color: rgba(0,0,0,.2);
+}
+
+
+
+.login form {
+    padding: 30px 40px;
+}
+
+.login .title {
+    color: #444;
+    font-size: 22px;
+    margin: 0 0 17px;
+    font-weight: 500;
+    font-family: "Roboto",sans-serif;
+}
+
+.matt_form_fields {
+    position: relative;
+    margin: 23px 0;
+    font-family: "Roboto",sans-serif;
+}
+
+.login label{
+	display: inline;
+}
+
+
+
+.matt_form_fields > label {
+    font-weight: 500;
+    font-size: 14px;
+    display: block;
+    color: #333;
+}
+
+.matt_form_fields input, .matt_form_fields select {
+    height: 44px;
+}
+
+.matt_form_fields input, .matt_form_fields textarea, 
+.matt_form_fields select, .matt_form_fields > 
+.bootstrap-select.btn-group > .dropdown-toggle {
+    background-color: transparent;
+    border-radius: 4px;
+    color: #393d4a;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+    padding: 8px;
+    width: 100%;
+    border: 0;
+    outline: 0;
+    border: 1px solid #9a9a9a;
+}
+
+.forgot_password {
+    text-align: right;
+    margin: -7px 0 35px;
+}
+
+.forgot_password  a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login_signup_combo {
+    margin: 20px 0;	
+    position: relative;
+}
+
+.login_signup_combo .login__ {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login_signup_combo .login__ .btn {
+    width: 100%;
+    line-height: 30px;
+}
+
+
+.login_signup_combo .signup__ {
+    text-align: center;
+    margin: 15px 0 -10px;
+}
+
+
+@media (max-width: 1300px) {
+
+}
+
+
+@media (max-width: 991px) {
+	.login {
+     width: 80%
+
+}
+
+@media (max-width: 767px) {
+
+	.login {
+    width: 71%;
+}
+
+	.login-page{
+		position: unset;
+     border-top-left-radius: 10px;
+     border-top-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    }	
+}
+
+@media (max-width: 575px) {
+	.login {
+    width: 90%;
+}
+}
+
