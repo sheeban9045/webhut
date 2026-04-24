@@ -11,9 +11,8 @@
     display:flex;
     flex-wrap:wrap;
     gap:20px;
-    margin-top:50px;
-    margin-bottom:50px;
-    justify-content:center;
+    margin:50px 20px;
+    justify-content:start;
 }
 
 .product-grid-custom{
@@ -73,56 +72,69 @@
 </style>
 <?php 
 
-$se_host = 'localhost';
+// $se_host = 'localhost';
 // $se_user = 'webhut96_parent_community';
 // $se_pass = '@#$Deepak25';
-$se_user = 'root';
-$se_pass = '';
-$se_db   = 'webhut96_parent_community';
+// $se_db   = 'webhut96_parent_community';
 
-$se_conn = mysqli_connect($se_host, $se_user, $se_pass, $se_db);
+// $se_conn = mysqli_connect($se_host, $se_user, $se_pass, $se_db);
 
-if (!$se_conn) die("Connection failed: " . mysqli_connect_error());
+// if (!$se_conn) die("Connection failed: " . mysqli_connect_error());
 
-$query = "SELECT p.*, c.*, f.*, o.*
-FROM engine4_sitestoreproduct_products p
-LEFT JOIN engine4_storage_files f 
-ON p.photo_id = f.file_id
-LEFT JOIN engine4_sitestoreproduct_categories c
-ON p.category_id = c.category_id
-LEFT JOIN engine4_sitestoreproduct_otherinfo o
-ON p.product_id = o.product_id
-WHERE p.approved = 1";
+// $query = "SELECT p.*, c.*, f.*, o.*
+// FROM engine4_sitestoreproduct_products p
+// LEFT JOIN engine4_storage_files f 
+// ON p.photo_id = f.file_id
+// LEFT JOIN engine4_sitestoreproduct_categories c
+// ON p.category_id = c.category_id
+// LEFT JOIN engine4_sitestoreproduct_otherinfo o
+// ON p.product_id = o.product_id
+// WHERE p.approved = 1";
 
-$result = mysqli_query($se_conn, $query);
+// $result = mysqli_query($se_conn, $query);
+
+$sql = 'Select * from crm_webhut_plugins where status = "active" AND deleted = 0';
+
+$result = mysqli_query($conn, $sql);
+
 
 echo '<div class="products-wrapper">';
 
     while($row = mysqli_fetch_assoc($result)){
-        $image = "https://webhut.net/webhut-parent-community/".$row['storage_path'];
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $row['title'])));
-        $old_price = $row['price'];
-        $price = $old_price - $row['discount_amount'];
+        $image = $baseURL . "/store-admin/uploads/plugins/icons/".$row['icon'];
+        $slug = $row['code'];
+        $old_price = $row['rate'];
+        $discount_type = $row['discount_type'];
+        if($discount_type == 'percentage'){
+            $discount_amount = ($old_price * $row['discount_value'])/100;
+        } else {
+            $discount_amount = $row['discount_value'];
+        }
+        $price = $old_price - $discount_amount;
 
         ?>
 
         <div class="product-grid-custom">
             <img src="<?php echo $image; ?>">
             <div class="product-title-custom">
-                <?php echo $row['title']; ?>
+                <?php echo $row['name']; ?>
             </div>
-            <!-- <div class="product-category-custom">
-                <?php // echo $row['category_name']; ?>
-            </div> -->
             <div class="price-custom">
                 $<?php echo $price; ?>
-                <?php if($row['discount_amount']>0){ ?>
+                <?php if($discount_amount>0){ ?>
                     <span class="old-price-custom">$<?php echo $old_price; ?></span>
-                    <span class="discount-custom">(<?php echo $row['discount_percentage']; ?>% off)</span>
+                    <?php 
+                        if($discount_type == 'percentage'){
+                            $discount_value = $row['discount_value'] . "%";
+                        } else {
+                            $discount_value = "$" . $row['discount_value'];
+                        }
+                    ?>
+                    <span class="discount-custom">(<?php echo $discount_value; ?> off)</span>
                 <?php } ?>
             </div>
             <br>
-            <a href="/webhut-parent-community/stores/product/<?php echo $row['product_id']; ?>/<?php echo $slug; ?>" class="cart-btn-custom"></a>
+            <a href="#" class="cart-btn-custom"></a>
         </div>
         <?php } ?>
 </div>
