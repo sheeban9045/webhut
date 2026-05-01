@@ -134,7 +134,7 @@ echo '<div class="products-wrapper">';
                 <?php } ?>
             </div>
             <br>
-            <a href="#" class="cart-btn-custom"></a>
+            <a href="/store-admin/index.php/Webhut_plugins/Plugin_details/<?php echo $row['id']; ?>" class="cart-btn-custom"></a>
         </div>
         <?php } ?>
 </div>
