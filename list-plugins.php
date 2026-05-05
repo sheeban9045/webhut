@@ -1,140 +1,236 @@
 <?php require './Config.php'; ?>
-<!--header-->
 <?php require './header.php'; ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-.products-wrapper{
-    display:flex;
-    flex-wrap:wrap;
-    gap:20px;
-    margin:50px 20px;
-    justify-content:start;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Hero Banner ── */
+.plugins-hero {
+    background: linear-gradient(135deg, #2b84d1 0%, #2b84d1 50%, #4a4fe0 100%);
+    padding: 60px 20px 70px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Nunito', sans-serif;
 }
 
-.product-grid-custom{
-    width:220px;
-    border:1px solid #ddd;
-    padding:10px;
-    font-family:arial;
-    background:#fff;
+.plugins-hero::before,
+.plugins-hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
 }
+.plugins-hero::before { width: 320px; height: 320px; top: -80px; left: -80px; }
+.plugins-hero::after  { width: 260px; height: 260px; bottom: -80px; right: -60px; }
 
-.product-grid-custom img{
-    width:100%;
-    height:150px;
-    object-fit:contain;
-}
-
-.product-title-custom{
-    font-size:16px;
-    color:#1a73e8;
-    margin-top:8px;
-}
-
-.product-category-custom{
-    font-size:13px;
-    color:#777;
-}
-
-.price-custom{
-    font-size:18px;
-    color:#e65100;
-    font-weight:bold;
-}
-
-.old-price-custom{
-    text-decoration:line-through;
-    color:#777;
-    font-size:14px;
-    margin-left:5px;
-}
-
-.discount-custom{
-    color:green;
-    font-size:13px;
-}
-
-.cart-btn-custom {
+.plugins-hero h1 {
     color: #fff;
-    background: url(https://webhut.net/webhut-parent-community/application/modules/Sitestoreproduct/externals/images/icons/cart-add24.png?c=54) no-repeat center;
-    background-color: #5cb85c;
-    padding: 6px 10px;
-    display: block;
-    width: 50%;
-    height: 36px;
-    border-radius: 4px;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.plugins-hero p {
+    color: rgba(255,255,255,0.85);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+}
+
+.plugins-hero p strong { color: #fff; }
+
+/* ── Grid ── */
+.plugins-section {
+    background: #f4f6fb;
+    padding: 50px 40px 60px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.plugins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ── Card ── */
+.plugin-card {
+    background: #fff;
+    border: 1px solid #e6e9f4;
+    border-radius: 14px;
+    padding: 32px 24px 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.plugin-card:hover {
+    box-shadow: 0 12px 36px rgba(61, 63, 204, 0.14);
+    transform: translateY(-4px);
+}
+
+/* Subtle bottom-right blob like in screenshot */
+.plugin-card::after {
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(74, 79, 224, 0.07);
+    bottom: -30px;
+    right: -20px;
+}
+
+/* ── Icon circle ── */
+.plugin-icon-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px dashed #b8bdf5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f2ff;
+    margin-bottom: 6px;
+}
+
+.plugin-icon-wrap img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+/* ── Name ── */
+.plugin-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1a1d3b;
+    line-height: 1.4;
+}
+
+/* ── Price ── */
+.plugin-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.plugin-price-now {
+    font-size: 20px;
+    font-weight: 800;
+    color: #2b84d1;
+}
+
+.plugin-price-old {
+    font-size: 14px;
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+.plugin-discount-badge {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* ── Button ── */
+.plugin-btn {
+    display: inline-block;
+    margin-top: 6px;
+    background: #2b84d1;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 28px;
+    border-radius: 8px;
     text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: background 0.2s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.plugin-btn:hover {
+    background: #1e2290;
+    color: #fff;
 }
 </style>
-<?php 
 
-// $se_host = 'localhost';
-// $se_user = 'webhut96_parent_community';
-// $se_pass = '@#$Deepak25';
-// $se_db   = 'webhut96_parent_community';
-
-// $se_conn = mysqli_connect($se_host, $se_user, $se_pass, $se_db);
-
-// if (!$se_conn) die("Connection failed: " . mysqli_connect_error());
-
-// $query = "SELECT p.*, c.*, f.*, o.*
-// FROM engine4_sitestoreproduct_products p
-// LEFT JOIN engine4_storage_files f 
-// ON p.photo_id = f.file_id
-// LEFT JOIN engine4_sitestoreproduct_categories c
-// ON p.category_id = c.category_id
-// LEFT JOIN engine4_sitestoreproduct_otherinfo o
-// ON p.product_id = o.product_id
-// WHERE p.approved = 1";
-
-// $result = mysqli_query($se_conn, $query);
-
-$sql = 'Select * from crm_webhut_plugins where status = "active" AND deleted = 0';
-
-$result = mysqli_query($conn, $sql);
-
-
-echo '<div class="products-wrapper">';
-
-    while($row = mysqli_fetch_assoc($result)){
-        $image = $baseURL . "/store-admin/uploads/plugins/icons/".$row['icon'];
-        $slug = $row['code'];
-        $old_price = $row['rate'];
-        $discount_type = $row['discount_type'];
-        if($discount_type == 'percentage'){
-            $discount_amount = ($old_price * $row['discount_value'])/100;
-        } else {
-            $discount_amount = $row['discount_value'];
-        }
-        $price = $old_price - $discount_amount;
-
-        ?>
-
-        <div class="product-grid-custom">
-            <img src="<?php echo $image; ?>">
-            <div class="product-title-custom">
-                <?php echo $row['name']; ?>
-            </div>
-            <div class="price-custom">
-                $<?php echo $price; ?>
-                <?php if($discount_amount>0){ ?>
-                    <span class="old-price-custom">$<?php echo $old_price; ?></span>
-                    <?php 
-                        if($discount_type == 'percentage'){
-                            $discount_value = $row['discount_value'] . "%";
-                        } else {
-                            $discount_value = "$" . $row['discount_value'];
-                        }
-                    ?>
-                    <span class="discount-custom">(<?php echo $discount_value; ?> off)</span>
-                <?php } ?>
-            </div>
-            <br>
-            <a href="/store-admin/index.php/Webhut_plugins/Plugin_details/<?php echo $row['id']; ?>" class="cart-btn-custom"></a>
-        </div>
-        <?php } ?>
+<!-- Hero Banner -->
+<div class="plugins-hero">
+    <h1>Our Plugins</h1>
+    <p>Upgrade your <strong>website builder software</strong> with our <strong>Plugins</strong> — crafted to enhance, increase and extend its functionality.</p>
 </div>
+
+<!-- Plugin Cards -->
+<div class="plugins-section">
+    <div class="plugins-grid">
+    <?php
+        $sql = 'SELECT * FROM crm_webhut_plugins WHERE status = "active" AND deleted = 0';
+        $result = mysqli_query($conn, $sql);
+
+        while ($row = mysqli_fetch_assoc($result)):
+            $image         = $baseURL . "/store-admin/uploads/plugins/icons/" . $row['icon'];
+            $old_price     = $row['rate'];
+            $discount_type = $row['discount_type'];
+
+            if ($discount_type == 'percentage') {
+                $discount_amount = ($old_price * $row['discount_value']) / 100;
+            } else {
+                $discount_amount = $row['discount_value'];
+            }
+
+            $price = $old_price - $discount_amount;
+
+            if ($discount_type == 'percentage') {
+                $discount_label = $row['discount_value'] . "% off";
+            } else {
+                $discount_label = "$" . $row['discount_value'] . " off";
+            }
+    ?>
+        <div class="plugin-card">
+            <div class="plugin-icon-wrap">
+                <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($row['name']); ?>">
+            </div>
+
+            <div class="plugin-name"><?php echo htmlspecialchars($row['name']); ?></div>
+
+            <div class="plugin-price-row">
+                <span class="plugin-price-now">$<?php echo number_format($price, 2); ?></span>
+                <?php if ($discount_amount > 0): ?>
+                    <span class="plugin-price-old">$<?php echo number_format($old_price, 2); ?></span>
+                    <span class="plugin-discount-badge"><?php echo htmlspecialchars($discount_label); ?></span>
+                <?php endif; ?>
+            </div>
+
+            <a href="plugin-details.php?id=<?php echo (int)$row['id']; ?>" class="plugin-btn">
+                Learn More
+            </a>
+        </div>
+    <?php endwhile; ?>
+    </div>
+</div>
+
+<?php require './footer.php'; ?>
