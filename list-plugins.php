@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0;font-family: "roboto", sans-serif; }
 
 /* ── Hero Banner ── */
 .plugins-hero {
@@ -15,7 +15,6 @@
     text-align: center;
     position: relative;
     overflow: hidden;
-    font-family: 'Nunito', sans-serif;
 }
 
 .plugins-hero::before,
@@ -29,22 +28,20 @@
 .plugins-hero::after  { width: 260px; height: 260px; bottom: -80px; right: -60px; }
 
 .plugins-hero h1 {
+    font-weight: 500;
     color: #fff;
-    font-size: 36px;
-    font-weight: 800;
-    margin-bottom: 14px;
-    position: relative;
-    z-index: 1;
+    font-size: 3rem;
+    line-height: 1.2;
 }
 
 .plugins-hero p {
-    color: rgba(255,255,255,0.85);
-    font-size: 16px;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.7;
-    position: relative;
-    z-index: 1;
+    font-weight: 400;
+    width: 70%;
+    margin: auto;
+    color: #ffffff;
+    margin-bottom: 1.5rem !important;
+    margin-top: 1.5rem !important;
+    font-size: 1.25rem;
 }
 
 .plugins-hero p strong { color: #fff; }
@@ -53,12 +50,11 @@
 .plugins-section {
     background: #f4f6fb;
     padding: 50px 40px 60px;
-    font-family: 'Nunito', sans-serif;
 }
 
 .plugins-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     gap: 28px;
     max-width: 1200px;
     margin: 0 auto;
@@ -118,8 +114,8 @@
 
 /* ── Name ── */
 .plugin-name {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 28px;
+    font-weight: 600;
     color: #1a1d3b;
     line-height: 1.4;
 }
@@ -160,7 +156,6 @@
     margin-top: 6px;
     background: #2b84d1;
     color: #fff;
-    font-family: 'Nunito', sans-serif;
     font-size: 14px;
     font-weight: 700;
     padding: 10px 28px;

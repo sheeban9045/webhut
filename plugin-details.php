@@ -43,7 +43,7 @@ $icon_url = $baseURL . "/store-admin/uploads/plugins/icons/" . $row['icon'];
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
+body { background: #f4f6fb; color: #1a1d3b;font-family: "roboto", sans-serif; }
 
 /* ── Hero ── */
 .pd-hero {
@@ -62,11 +62,10 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
 .pd-hero::before { width: 300px; height: 300px; top: -80px; left: -80px; }
 .pd-hero::after  { width: 250px; height: 250px; bottom: -80px; right: -60px; }
 .pd-hero h1 {
+    font-weight: 500;
     color: #fff;
-    font-size: 30px;
-    font-weight: 800;
-    position: relative;
-    z-index: 1;
+    font-size: 3rem;
+    line-height: 1.2;
 }
 
 /* ── Layout ── */
@@ -99,13 +98,13 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
     padding: 6px;
 }
 .pd-product-header-info h2 {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 800;
     color: #2b84d1;
     margin-bottom: 6px;
 }
-.pd-price-now  { font-size: 22px; font-weight: 800; color: #2b84d1; }
-.pd-price-old  { font-size: 15px; color: #aaa; text-decoration: line-through; margin-left: 8px; }
+.pd-price-now  { font-size: 18px; font-weight: 800; color: #2b84d1; }
+.pd-price-old  { font-size: 14px; color: #aaa; text-decoration: line-through; margin-left: 8px; }
 .pd-discount   { font-size: 12px; font-weight: 700; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 20px; margin-left: 6px; }
 
 /* ── Tabs ── */
@@ -123,7 +122,6 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
     color: #888;
     background: none;
     border: none;
-    font-family: 'Nunito', sans-serif;
     transition: background 0.2s, color 0.2s;
 }
 .pd-tab.active {
@@ -139,7 +137,7 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
 .pd-tab-content.active { display: block; }
 
 .pd-description {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.8;
     color: #444;
     white-space: pre-line;
@@ -177,7 +175,6 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
     background: #2b84d1;
     color: #fff;
     text-align: center;
-    font-family: 'Nunito', sans-serif;
     font-size: 16px;
     font-weight: 800;
     padding: 16px;
@@ -195,8 +192,8 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
     overflow: hidden;
 }
 .pd-info-box-title {
-    font-size: 15px;
-    font-weight: 800;
+    font-size: 16px;
+    font-weight: 600;
     color: #1a1d3b;
     padding: 16px 20px;
     border-bottom: 1px solid #f0f2ff;
@@ -220,8 +217,8 @@ body { font-family: 'Nunito', sans-serif; background: #f4f6fb; color: #1a1d3b; }
     padding: 20px;
     text-align: center;
 }
-.pd-support-box h4 { font-size: 15px; font-weight: 800; color: #2b84d1; margin-bottom: 10px; }
-.pd-support-box p  { font-size: 13px; color: #666; line-height: 1.7; }
+.pd-support-box h4 { font-size: 16px; font-weight: 600; color: #2b84d1; margin-bottom: 10px; }
+.pd-support-box p  { font-size: 14px; color: #666; line-height: 1.7; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
