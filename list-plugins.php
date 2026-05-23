@@ -171,12 +171,48 @@
     background: #1e2290;
     color: #fff;
 }
+
+.plugin-features {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.plugin-features li {
+    position: relative;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    padding-left: 16px;
+    line-height: 1.5;
+}
+
+.plugin-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+}
+
 </style>
 
 <!-- Hero Banner -->
 <div class="plugins-hero">
     <h1>Our Plugins</h1>
-    <p>Upgrade your <strong>website builder software</strong> with our <strong>Plugins</strong> — crafted to enhance, increase and extend its functionality.</p>
+    <!-- <p>Upgrade your <strong>website builder software</strong> with our <strong>Plugins</strong> — crafted to enhance, increase and extend its functionality.</p> -->
+    <ul class="plugin-features">
+        <li>Extend Your Social Platform Without Limits</li>
+        <li>Everything Your Social Platform Needs — In One Place</li>
+    </ul>
 </div>
 
 <!-- Plugin Cards -->
