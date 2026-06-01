@@ -203,6 +203,39 @@
     border-radius: 50%;
 }
 
+.plugin-filter-buttons{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    margin-bottom:40px;
+    flex-wrap:wrap;
+}
+
+.plugin-filter-btn{
+    text-decoration:none;
+    background:#fff;
+    color:#2b84d1;
+    border:2px solid #2b84d1;
+    padding:10px 24px;
+    border-radius:30px;
+    font-size:15px;
+    font-weight:700;
+    transition:all 0.25s ease;
+}
+
+.plugin-filter-btn:hover{
+    background:#2b84d1;
+    color:#fff;
+    transform:translateY(-2px);
+}
+
+.plugin-filter-btn.active{
+    background:#2b84d1;
+    color:#fff;
+    box-shadow:0 8px 20px rgba(43,132,209,0.2);
+}
+
 </style>
 
 <!-- Hero Banner -->
@@ -217,30 +250,58 @@
 
 <!-- Plugin Cards -->
 <div class="plugins-section">
+    <!-- Filter Buttons -->
+    <div class="plugin-filter-buttons">
+        <a href="?type=all" 
+           class="plugin-filter-btn <?php echo (!isset($_GET['type']) || $_GET['type'] == 'all') ? 'active' : ''; ?>">
+            All
+        </a>
+
+        <a href="?type=released" 
+           class="plugin-filter-btn <?php echo (isset($_GET['type']) && $_GET['type'] == 'released') ? 'active' : ''; ?>">
+            Released Plugin
+        </a>
+
+        <a href="?type=upcoming" 
+           class="plugin-filter-btn <?php echo (isset($_GET['type']) && $_GET['type'] == 'upcoming') ? 'active' : ''; ?>">
+            Upcoming Plugin
+        </a>
+    </div>
     <div class="plugins-grid">
     <?php
-        $sql = 'SELECT * FROM crm_webhut_plugins WHERE status = "active" AND deleted = 0';
+        $type = $_GET['type'] ?? 'all';
+
+        $sql = 'SELECT * FROM crm_webhut_plugins 
+                WHERE status = "active" 
+                AND deleted = 0';
+
+        if ($type == 'released') {
+            $sql .= ' AND label = "released"';
+        } elseif ($type == 'upcoming') {
+            $sql .= ' AND label = "upcoming"';
+        }
+
         $result = mysqli_query($conn, $sql);
+        if (mysqli_num_rows($result) > 0):
+            while ($row = mysqli_fetch_assoc($result)):
+                $image         = $baseURL . "/store-admin/uploads/plugins/icons/" . $row['icon'];
+                $old_price     = $row['rate'];
+                $discount_type = $row['discount_type'];
 
-        while ($row = mysqli_fetch_assoc($result)):
-            $image         = $baseURL . "/store-admin/uploads/plugins/icons/" . $row['icon'];
-            $old_price     = $row['rate'];
-            $discount_type = $row['discount_type'];
+                if ($discount_type == 'percentage') {
+                    $discount_amount = ($old_price * $row['discount_value']) / 100;
+                } else {
+                    $discount_amount = $row['discount_value'];
+                }
 
-            if ($discount_type == 'percentage') {
-                $discount_amount = ($old_price * $row['discount_value']) / 100;
-            } else {
-                $discount_amount = $row['discount_value'];
-            }
+                $price = $old_price - $discount_amount;
 
-            $price = $old_price - $discount_amount;
-
-            if ($discount_type == 'percentage') {
-                $discount_label = $row['discount_value'] . "% off";
-            } else {
-                $discount_label = "$" . $row['discount_value'] . " off";
-            }
-    ?>
+                if ($discount_type == 'percentage') {
+                    $discount_label = $row['discount_value'] . "% off";
+                } else {
+                    $discount_label = "$" . $row['discount_value'] . " off";
+                }
+        ?>
         <div class="plugin-card">
             <div class="plugin-icon-wrap">
                 <img src="<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($row['name']); ?>">
@@ -260,7 +321,14 @@
                 Learn More
             </a>
         </div>
-    <?php endwhile; ?>
+    <?php endwhile;
+    else:
+    ?>
+        <div class="empty-plugin-message">
+            <h3>No Plugins Found</h3>
+        </div>
+
+    <?php endif; ?>
     </div>
 </div>
 
