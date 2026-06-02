@@ -190,9 +190,9 @@
     }
     .icon-wrap img { width: 54px; height: auto; border-radius: 8px; }
 
-    .card h2 { font-size: 20px; font-weight: 600; color: #1a1f36; }
+    .card h2 { font-size: 20px; font-weight: 600; color: #1a1f36;margin: 0; }
 
-    .pricing { display: flex; align-items: center; gap: 8px; }
+    .pricing { display: flex; align-items: center; gap: 8px;padding:0;margin: 5px; }
     .price-new { font-size: 18px; font-weight: 600; color: #2c6ecb; }
     .price-old { font-size: 13px; color: #aaa; text-decoration: line-through; }
     .discount { font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
