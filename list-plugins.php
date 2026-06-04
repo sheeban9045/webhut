@@ -535,7 +535,12 @@
             </div> -->
 
             <div class="btn-row">
-                <button class="btn btn-cart"><i class="ti ti-shopping-cart" style="font-size:14px;"></i> Add to Cart</button>
+                 <button 
+                        class="btn btn-cart" 
+                        onclick="addToCart('<?php echo $row['id']; ?>', '<?php echo htmlspecialchars($row['name']); ?>', '<?php echo $price; ?>')"
+                    >
+                        <i class="ti ti-shopping-cart" style="font-size:14px;"></i> Add to Cart
+                </button>
                 <button class="btn btn-buy" onclick="window.location.href='/store-admin/index.php/Webhut_plugins/checkout/<?php echo $row['id']; ?>'">
                     <i class="ti ti-bolt" style="font-size:14px;"></i> Buy Now
                 </button>
