@@ -1,6 +1,9 @@
 <?php   
+    error_reporting(E_ALL);
+ini_set('display_errors', 1);
     session_start();
      //echo $_SESSION["uid"];die;
+    //  echo "<pre>";print_r($_SESSION);echo "</pre>";die;
 ?>
 
 <!--header-->
@@ -181,6 +184,81 @@
                                 <a class="dropdown-item" href="https://webhut.net/change-log.php">Change Log</a>
                             </div>
                         </li>
+                        <li class="nav-item" style="position: relative;">
+                            <button id="cartToggleBtn" style="background:none; border:none; cursor:pointer; position:relative; padding:6px 8px; color:#fff;">
+                                <i class="fa fa-shopping-cart" style="font-size:20px;"></i>
+                                <span id="cartBadge" style="
+                                    position:absolute; top:0; right:0;
+                                    background:#e74c3c; color:#fff;
+                                    border-radius:50%; font-size:10px; font-weight:600;
+                                    width:16px; height:16px;
+                                    display:flex; align-items:center; justify-content:center;">
+                                    <?php
+                                        $count = 0;
+                                        if (!empty($_SESSION['cart'])) {
+                                            $count = array_sum(array_column($_SESSION['cart'], 'qty'));
+                                        }
+                                        echo $count > 0 ? $count : '';
+                                    ?>
+                                </span>
+                            </button>
+
+                            <!-- Dropdown -->
+                            <div id="cartDropdown" style="
+                                display:none; position:absolute; top:46px; right:0;
+                                width:320px; background:#fff;
+                                border:1px solid #ddd; border-radius:10px;
+                                box-shadow:0 8px 24px rgba(0,0,0,0.12);
+                                z-index:9999; overflow:hidden;">
+
+                                <!-- Header -->
+                                <div style="padding:12px 16px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                                    <strong style="font-size:14px;">🛒 My Cart</strong>
+                                    <span id="cartItemCount" style="font-size:12px; color:#666; background:#f5f5f5; padding:2px 8px; border-radius:20px;">
+                                        <?php echo $count; ?> items
+                                    </span>
+                                </div>
+
+                                <!-- Items List -->
+                                <div id="cartItemsList" style="max-height:250px; overflow-y:auto;">
+                                    <?php
+                                    if (!empty($_SESSION['cart'])) {
+                                        foreach ($_SESSION['cart'] as $item) {
+                                            echo '<div class="cart-drop-item" data-id="'.$item['id'].'" style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid #f0f0f0;">
+                                                <div style="flex:1;">
+                                                    <div style="font-size:13px; font-weight:600; color:#333;">'.htmlspecialchars($item['name']).'</div>
+                                                    <div style="font-size:12px; color:#888; margin-top:2px;">₹'.number_format((float)$item['price']).' × '.$item['qty'].'</div>
+                                                </div>
+                                                <button onclick="removeFromCart('.$item['id'].')" style="background:none; border:none; cursor:pointer; color:#aaa; font-size:18px; padding:4px;" title="Remove">✕</button>
+                                            </div>';
+                                        }
+                                    } else {
+                                        echo '<div style="padding:30px; text-align:center; color:#aaa; font-size:13px;">🛒 Cart is empty</div>';
+                                    }
+                                    ?>
+                                </div>
+
+                                <div id="cartFooter" style="padding:12px 16px; background:#f9f9f9; border-top:1px solid #eee; display:<?php echo !empty($_SESSION['cart']) ? 'block' : 'none'; ?>;">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                                        <span style="font-size:13px; color:#666;">Total</span>
+                                        <strong id="cartTotal" style="font-size:15px;">
+                                            ₹<?php
+                                                $total = 0;
+                                                if (!empty($_SESSION['cart'])) {
+                                                    foreach ($_SESSION['cart'] as $item) {
+                                                        $total += (float)$item['price'] * $item['qty'];
+                                                    }
+                                                }
+                                                echo number_format((float)$total);
+                                            ?>
+                                        </strong>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <a href="/store-admin/index.php/Webhut_plugins/checkout" style="flex:1; padding:9px; text-align:center; background:#12407a; border-radius:6px; color:#fff; font-size:13px; font-weight:600; text-decoration:none;">⚡ Checkout</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>  
                         <li class="nav-item">
                             <a href="https://webhut.net/comparison-table.php" class="btn align-middle btn-primary my-2 my-lg-0">Demo</a>
                         </li>
