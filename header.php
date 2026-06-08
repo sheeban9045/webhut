@@ -188,7 +188,7 @@ ini_set('display_errors', 1);
                             <button id="cartToggleBtn" style="background:none; border:none; cursor:pointer; position:relative; padding:6px 8px; color:#fff;">
                                 <i class="fa fa-shopping-cart" style="font-size:20px;"></i>
                                 <span id="cartBadge" style="
-                                    position:absolute; top:0; right:0;
+                                    position:absolute; top:1px; right:0;
                                     background:#e74c3c; color:#fff;
                                     border-radius:50%; font-size:10px; font-weight:600;
                                     width:16px; height:16px;
@@ -198,7 +198,7 @@ ini_set('display_errors', 1);
                                         if (!empty($_SESSION['cart'])) {
                                             $count = array_sum(array_column($_SESSION['cart'], 'qty'));
                                         }
-                                        echo $count > 0 ? $count : '';
+                                        echo $count > 0 ? $count : 0;
                                     ?>
                                 </span>
                             </button>
