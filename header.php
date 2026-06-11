@@ -124,10 +124,19 @@ ini_set('display_errors', 1);
                                 </li>
                             </ul>
                         <?php 
-                            }
-                            //else Name pending !
+                            } else {
                         ?>
-
+                            <ul class="text-right mb-0">
+                                <li>                                     
+                                    <a class="nav-link" href="/store-admin/index.php/dashboard">My Account</a>
+                                </li>
+                                <li>                                     
+                                    <a class="nav-link" href="/store-admin/index.php/signin/sign_out">Logout</a>
+                                </li>
+                            </ul>
+                        <?php 
+                            }
+                        ?>
                         </div>
                     </div>
                 </div>
