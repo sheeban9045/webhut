@@ -419,8 +419,8 @@
     <h1>Our Plugins</h1>
     <!-- <p>Upgrade your <strong>website builder software</strong> with our <strong>Plugins</strong> — crafted to enhance, increase and extend its functionality.</p> -->
     <ul class="plugin-features">
-        <li>Extend Your Social Platform Without Limits</li>
-        <li>Everything Your Social Platform Needs — In One Place</li>
+        <li>Extend Your Website Without Limits</li>
+        <li>Everything Your Website Needs — In One Place</li>
     </ul>
 </div>
 
