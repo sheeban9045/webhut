@@ -105,7 +105,7 @@ ini_set('display_errors', 1);
                             </ul> -->
                         <?php 
                             
-                            if(isset($_SESSION["uid"]) && $_SESSION["uid"]=="")
+                            if(!isset($_SESSION["uid"]) || $_SESSION["uid"]=="")
                             {
 
                         ?>
