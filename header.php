@@ -1,7 +1,9 @@
 <?php   
     error_reporting(E_ALL);
-ini_set('display_errors', 1);
-    session_start();
+    ini_set('display_errors', 1);
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
      //echo $_SESSION["uid"];die;
     //  echo "<pre>";print_r($_SESSION);echo "</pre>";die;
 ?>
@@ -68,8 +70,30 @@ ini_set('display_errors', 1);
         }
     </style>
     
-    
-    
+    <!-- Bootstrap 4 dropdown support (jQuery + Popper included via bundle) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .navbar, .navbar .container-fluid, .navbar-collapse { overflow: visible !important; }
+        .navbar .nav-item.dropdown { position: relative; }
+        .navbar .dropdown-toggle::after { display:none !important; }
+        .navbar .dropdown-toggle .fa { font-size:10px; margin-left:5px; transition:transform .2s ease; }
+        .navbar .dropdown.show .dropdown-toggle .fa { transform:rotate(180deg); }
+        .navbar .dropdown-menu { min-width:225px; margin-top:8px; padding:8px 0; border:0; border-radius:10px; background:#fff; box-shadow:0 12px 35px rgba(0,0,0,.18); z-index:99999; }
+        .navbar .dropdown-menu::before { content:''; position:absolute; top:-6px; left:24px; width:12px; height:12px; background:#fff; transform:rotate(45deg); }
+        .navbar .dropdown-menu-right::before { left:auto; right:24px; }
+        .navbar .dropdown-item { position:relative; z-index:1; padding:10px 18px; color:#30343b; font-size:14px; font-weight:500; white-space:nowrap; transition:all .18s ease; }
+        .navbar .dropdown-item:hover, .navbar .dropdown-item:focus { color:#fff; background:#287dcc; }
+        @media (min-width:992px) {
+            .navbar .nav-item.dropdown:hover > .dropdown-menu { display:block; opacity:1; visibility:visible; transform:translateY(0); }
+            .navbar .dropdown-menu { display:block; opacity:0; visibility:hidden; transform:translateY(6px); transition:opacity .18s ease, transform .18s ease, visibility .18s ease; }
+        }
+        @media (max-width:991.98px) {
+            .navbar .dropdown-menu { margin-top:0; border-radius:8px; box-shadow:0 8px 25px rgba(0,0,0,.15); }
+            .navbar .dropdown-menu::before { display:none; }
+        }
+    </style>
 </head>
 
 <body>
@@ -159,10 +183,10 @@ ini_set('display_errors', 1);
                             <a class="nav-link" href="about.php">About Us</a>
                         </li>
                         <li class="nav-item dropdown"> 
-                            <a class="nav-link" href="#" data-toggle="dropdown">Features 
-                                <span class="pe-2x pe-7s-angle-down" style="color: #ffffff;"></span>  
+                            <a class="nav-link dropdown-toggle" href="#" id="featuresDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Features 
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>  
                             </a>
-                            <div class="dropdown-menu"> 
+                            <div class="dropdown-menu" aria-labelledby="featuresDropdown"> 
                                 <a class="dropdown-item" href="comparison-table.php">Features Plan Comparison</a>
                                 <!-- <a class="dropdown-item" href="#">Earn More Money</a>
                                 <a class="dropdown-item" href="#">Instant Messaging</a>
@@ -184,8 +208,21 @@ ini_set('display_errors', 1);
                             <a class="nav-link" href="faq.php">FAQ</a>
                         </li>
                         <li class="nav-item dropdown"> 
-                            <a class="nav-link" href="#" data-toggle="dropdown">More 
-                                <span class="pe-2x pe-7s-angle-down" style="color: #ffffff;"></span>  
+                            <a class="nav-link dropdown-toggle" href="#" id="forumDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Forum 
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>  
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="forumDropdown">
+                                <a class="dropdown-item" href="forum.php">Forum</a>
+                                <?php if (!empty($_SESSION["uid"])) { ?>
+                                <a class="dropdown-item" href="forum-new-topic.php">New Topic</a>
+                                <a class="dropdown-item" href="forum-my-topics.php">My Topics</a>
+                                <a class="dropdown-item" href="forum-my-replies.php">My Replies</a>
+                                <?php } ?>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown"> 
+                            <a class="nav-link dropdown-toggle" href="#" id="moreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More 
+                                <i class="fa fa-chevron-down" aria-hidden="true"></i>  
                             </a>
                             <div class="dropdown-menu">                                
                                 <a class="dropdown-item" href="#">Customization</a>
@@ -271,10 +308,23 @@ ini_set('display_errors', 1);
                         <li class="nav-item">
                             <a href="https://webhut.net/comparison-table.php" class="btn align-middle btn-primary my-2 my-lg-0">Demo</a>
                         </li>
-                         <a href="pricing.php" class="btn align-middle btn-primary my-2 my-lg-0">Buy Now</a>
-                        </li>
+                         <li class="nav-item">
+                             <a href="pricing.php" class="btn align-middle btn-primary my-2 my-lg-0">Buy Now</a>
+                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Keep Bootstrap's click/touch dropdown behavior and close other menus cleanly.
+    if (window.jQuery && jQuery.fn.dropdown) {
+        jQuery('.navbar .dropdown-toggle').on('click', function (e) {
+            if (this.getAttribute('href') === '#') {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
