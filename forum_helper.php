@@ -684,7 +684,7 @@ function forum_render_subnav($active, $action_html = '') {
 
 function forum_new_topic_button($category_id = 0) {
     if (forum_current_user()) {
-        return '<a href="' . forum_new_topic_url($category_id) . '" class="btn btn-primary forum-btn"><i class="fa fa-plus"></i> New Topic</a>';
+        return '<a href="' . forum_new_topic_url($category_id) . '" class="btn btn-primary forum-btn forum-login-btn"><i class="fa fa-plus"></i> New Topic</a>';
     }
     return '<a href="' . FORUM_LOGIN_URL . '" class="btn btn-outline-primary forum-btn"><i class="fa fa-sign-in"></i> Log in to post</a>';
 }
