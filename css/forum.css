@@ -518,6 +518,22 @@
 .forum-form-actions { display: flex; justify-content: flex-end; gap: .6em; flex-wrap: wrap; }
 .forum-error-list { margin: .4em 0 0; padding-left: 1.2em; }
 
+/* ---------- Filters (My Topics / My Replies) ---------- */
+.forum-filter-card { margin-bottom: 1.5em; }
+.forum-filter-form .form-group { margin-bottom: 1em; }
+.forum-filter-form label { display: block; font-size: .82rem; font-weight: 500; color: var(--forum-dark); margin-bottom: .35em; }
+.forum-filter-form .form-control { height: 42px; border-radius: 10px; padding: 6px 14px; font-size: .92rem; box-shadow: none; }
+.forum-filter-actions { display: flex; align-items: center; gap: .6em; flex-wrap: wrap; padding-top: .3em; }
+.forum-filter-actions .btn { padding: 9px 20px; }
+.forum-filter-summary { font-size: .85rem; color: var(--forum-muted); margin-left: auto; }
+.forum-filter-summary strong { color: var(--forum-dark); }
+
+@media (max-width: 767px) {
+    .forum-filter-actions { justify-content: stretch; }
+    .forum-filter-actions .btn { flex: 1 1 auto; text-align: center; }
+    .forum-filter-summary { margin-left: 0; flex-basis: 100%; order: 3; }
+}
+
 /* ---------- My replies ---------- */
 .forum-page a.forum-myreply {
     display: block;
