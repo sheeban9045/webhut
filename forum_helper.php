@@ -487,11 +487,13 @@ function forum_count_topic_replies($topic_id) {
 }
 
 //a reply is visible only when its topic and category are visible too
+//tu is the author of the topic being replied to (used to filter/show "replied to X's topic")
 function forum_replies_base_sql() {
     return "FROM crm_forum_replies r
             INNER JOIN crm_forum_topics t ON t.id = r.topic_id AND t.deleted = 0
             INNER JOIN crm_forum_categories c ON c.id = t.category_id AND c.deleted = 0
             LEFT JOIN crm_users u ON u.id = r.created_by
+            LEFT JOIN crm_users tu ON tu.id = t.created_by
             WHERE r.deleted = 0";
 }
 
@@ -504,19 +506,25 @@ function forum_get_reply($reply_id) {
     );
 }
 
-function forum_get_user_replies($user_id, $limit, $offset) {
+//$filter_sql/$types/$params are appended to the WHERE clause, in addition to the fixed "created_by = user_id" condition
+function forum_get_user_replies($user_id, $filter_sql, $types, array $params, $limit, $offset) {
     return forum_db_all(
-        "SELECT r.id, r.topic_id, r.description, r.created_at, t.title AS topic_title, t.category_id, c.title AS category_title
-         " . forum_replies_base_sql() . " AND r.created_by = ?
+        "SELECT r.id, r.topic_id, r.description, r.created_at, t.title AS topic_title, t.category_id, c.title AS category_title,
+            " . forum_author_sql('tu') . " AS topic_author_name
+         " . forum_replies_base_sql() . " AND r.created_by = ? $filter_sql
          ORDER BY r.created_at DESC, r.id DESC
          LIMIT ? OFFSET ?",
-        'iii',
-        array((int) $user_id, (int) $limit, (int) $offset)
+        'i' . $types . 'ii',
+        array_merge(array((int) $user_id), $params, array((int) $limit, (int) $offset))
     );
 }
 
-function forum_count_user_replies($user_id) {
-    $row = forum_db_one("SELECT COUNT(r.id) AS total " . forum_replies_base_sql() . " AND r.created_by = ?", 'i', array((int) $user_id));
+function forum_count_user_replies($user_id, $filter_sql = '', $types = '', array $params = array()) {
+    $row = forum_db_one(
+        "SELECT COUNT(r.id) AS total " . forum_replies_base_sql() . " AND r.created_by = ? $filter_sql",
+        'i' . $types,
+        array_merge(array((int) $user_id), $params)
+    );
     return (int) $row['total'];
 }
 
@@ -533,6 +541,80 @@ function forum_get_like_info($topic_id, $user_id) {
 //escape the LIKE wildcards of a search term
 function forum_like_term($search) {
     return '%' . addcslashes($search, '\\%_') . '%';
+}
+
+/* ---------------------------------------------------------------------------
+ * Reusable list filters (My Topics / My Replies)
+ * Each helper appends its own SQL/type/param to the triple already used by
+ * forum_get_topics()/forum_count_topics()/forum_get_user_replies() etc.
+ * ------------------------------------------------------------------------- */
+
+function forum_filter_add_equals_int(&$sql, &$types, array &$params, $column, $value) {
+    $value = (int) $value;
+    if ($value > 0) {
+        $sql .= " AND $column = ?";
+        $types .= 'i';
+        $params[] = $value;
+    }
+}
+
+function forum_filter_add_like(&$sql, &$types, array &$params, $column, $value) {
+    $value = trim((string) $value);
+    if ($value !== '') {
+        $sql .= " AND $column LIKE ?";
+        $types .= 's';
+        $params[] = forum_like_term($value);
+    }
+}
+
+//converts a "Y-m-d" date (in the site timezone) into the UTC datetime bounds used to compare against stored UTC columns
+function forum_date_range_to_utc($date_from, $date_to) {
+    $timezone = forum_timezone();
+    $utc_from = null;
+    $utc_to = null;
+
+    if ($date_from && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from)) {
+        $start = DateTime::createFromFormat('Y-m-d H:i:s', $date_from . ' 00:00:00', $timezone);
+        if ($start) {
+            $start->setTimezone(new DateTimeZone('UTC'));
+            $utc_from = $start->format('Y-m-d H:i:s');
+        }
+    }
+
+    if ($date_to && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
+        $end = DateTime::createFromFormat('Y-m-d H:i:s', $date_to . ' 23:59:59', $timezone);
+        if ($end) {
+            $end->setTimezone(new DateTimeZone('UTC'));
+            $utc_to = $end->format('Y-m-d H:i:s');
+        }
+    }
+
+    return array($utc_from, $utc_to);
+}
+
+function forum_filter_add_date_range(&$sql, &$types, array &$params, $column, $date_from, $date_to) {
+    list($utc_from, $utc_to) = forum_date_range_to_utc($date_from, $date_to);
+    if ($utc_from) {
+        $sql .= " AND $column >= ?";
+        $types .= 's';
+        $params[] = $utc_from;
+    }
+    if ($utc_to) {
+        $sql .= " AND $column <= ?";
+        $types .= 's';
+        $params[] = $utc_to;
+    }
+}
+
+//query string of the active filters only, used to keep filters across pagination links
+function forum_filter_query_params(array $filters) {
+    $query = array();
+    foreach ($filters as $key => $value) {
+        if ($value !== '' && $value !== 0 && $value !== null) {
+            $query[$key] = $value;
+        }
+    }
+    return $query;
 }
 
 /* ---------------------------------------------------------------------------

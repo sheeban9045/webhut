@@ -207,19 +207,24 @@
                         <li class="nav-item"> 
                             <a class="nav-link" href="faq.php">FAQ</a>
                         </li>
-                        <li class="nav-item dropdown"> 
-                            <a class="nav-link dropdown-toggle" href="#" id="forumDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Forum 
-                                <i class="fa fa-chevron-down" aria-hidden="true"></i>  
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="forumDropdown">
-                                <a class="dropdown-item" href="forum.php">Forum</a>
-                                <?php if (!empty($_SESSION["uid"])) { ?>
-                                <a class="dropdown-item" href="forum-new-topic.php">New Topic</a>
-                                <a class="dropdown-item" href="forum-my-topics.php">My Topics</a>
-                                <a class="dropdown-item" href="forum-my-replies.php">My Replies</a>
-                                <?php } ?>
-                            </div>
-                        </li>
+
+                        <?php if (!empty($_SESSION["uid"])) { ?>
+                            <li class="nav-item dropdown"> 
+                                <a class="nav-link dropdown-toggle" href="#" id="forumDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Forum 
+                                    <i class="fa fa-chevron-down" aria-hidden="true"></i>  
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="forumDropdown">
+                                    <a class="dropdown-item" href="forum.php">Forum</a>
+                                    <a class="dropdown-item" href="forum-new-topic.php">New Topic</a>
+                                    <a class="dropdown-item" href="forum-my-topics.php">My Topics</a>
+                                    <a class="dropdown-item" href="forum-my-replies.php">My Replies</a>
+                                </div>
+                            </li>
+                        <?php } else { ?>
+                            <li class="nav-item"> 
+                                <a class="nav-link" href="forum.php">Forum</a>
+                            </li>
+                        <?php } ?>
                         <li class="nav-item dropdown"> 
                             <a class="nav-link dropdown-toggle" href="#" id="moreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More 
                                 <i class="fa fa-chevron-down" aria-hidden="true"></i>  
