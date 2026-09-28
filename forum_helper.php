@@ -476,7 +476,7 @@ function forum_get_topic($topic_id) {
 
 function forum_get_topic_replies($topic_id) {
     return forum_db_all(
-        "SELECT r.id, r.topic_id, r.description, r.created_by, r.created_at, u.job_title,u.role_id ," . forum_author_sql('u') . " AS author_name
+        "SELECT r.id, r.topic_id, r.description, r.created_by, r.created_at, u.job_title,u.role_id ," . forum_author_sql('u') . " AS author_name, u.is_admin
          FROM crm_forum_replies r
          LEFT JOIN crm_users u ON u.id = r.created_by
          WHERE r.deleted = 0 AND r.topic_id = ?
@@ -848,7 +848,7 @@ function forum_render_topic_item(array $topic, array $options = array()) {
 function forum_render_reply(array $reply, $current_user_id, $topic_author_id = 0) {
     $author = forum_author_name($reply['author_name']);
     $is_owner = $current_user_id && (int) $reply['created_by'] === (int) $current_user_id;
-
+    $is_admin = $reply['is_admin'] ? true : false;
     $job_title = $reply ? $reply['job_title'] : '';
     if($job_title == 'Untitled' || $job_title == 'null' || $job_title == null || $job_title == 'NULL' || $job_title == 'none' || $job_title == 'N/A' || $job_title == 'n/a') {
         $job_title = '';
@@ -866,7 +866,7 @@ function forum_render_reply(array $reply, $current_user_id, $topic_author_id = 0
         . '<div class="forum-reply-main">'
         . '<div class="forum-reply-head"><div class="forum-reply-who">'
         . '<span class="forum-reply-author">' . forum_e($author) . '</span>';
-    if ($topic_author_id && (int) $reply['created_by'] === (int) $topic_author_id) {
+    if ($is_admin) {
         $html .= '<span class="forum-tag">Admin</span>';
     }
     if( $job_title != '') {
