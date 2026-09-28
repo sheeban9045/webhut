@@ -86,7 +86,7 @@ function forum_current_user() {
     $uid = isset($_SESSION['uid']) ? (int) $_SESSION['uid'] : 0;
     if ($uid > 0) {
         $user = forum_db_one(
-            "SELECT id, first_name, last_name, is_admin, TRIM(CONCAT(IFNULL(first_name, ''), ' ', IFNULL(last_name, ''))) AS full_name
+            "SELECT id, first_name, last_name, is_admin, job_title, TRIM(CONCAT(IFNULL(first_name, ''), ' ', IFNULL(last_name, ''))) AS full_name
              FROM crm_users
              WHERE id = ? AND deleted = 0 AND status = 'active' AND disable_login = 0",
             'i',
@@ -459,10 +459,15 @@ function forum_count_topics($filter_sql, $types, array $params) {
 function forum_get_topic($topic_id) {
     return forum_db_one(
         "SELECT t.id, t.category_id, t.title, t.description, t.created_by, t.created_at, COALESCE(t.last_activity_at, t.created_at) AS last_activity_at,
-            c.title AS category_title, " . forum_author_sql('u') . " AS author_name
+            c.title AS category_title, " . forum_author_sql('u') . " AS author_name, u.job_title, u.is_admin,
+            CASE
+                WHEN u.role_id = 0 THEN 'Team Member'
+                ELSE r.title
+            END AS role_title
          FROM crm_forum_topics t
          INNER JOIN crm_forum_categories c ON c.id = t.category_id AND c.deleted = 0
          LEFT JOIN crm_users u ON u.id = t.created_by
+         LEFT JOIN crm_roles r ON r.id = u.role_id
          WHERE t.deleted = 0 AND t.id = ?",
         'i',
         array((int) $topic_id)
@@ -471,13 +476,21 @@ function forum_get_topic($topic_id) {
 
 function forum_get_topic_replies($topic_id) {
     return forum_db_all(
-        "SELECT r.id, r.topic_id, r.description, r.created_by, r.created_at, " . forum_author_sql('u') . " AS author_name
+        "SELECT r.id, r.topic_id, r.description, r.created_by, r.created_at, u.job_title,u.role_id ," . forum_author_sql('u') . " AS author_name
          FROM crm_forum_replies r
          LEFT JOIN crm_users u ON u.id = r.created_by
          WHERE r.deleted = 0 AND r.topic_id = ?
          ORDER BY r.created_at ASC, r.id ASC",
         'i',
         array((int) $topic_id)
+    );
+}
+
+function forum_get_role_title($role_id) {
+    return forum_db_one(
+        "SELECT title FROM crm_roles WHERE id = ?",
+        'i',
+        array((int) $role_id)
     );
 }
 
@@ -836,13 +849,31 @@ function forum_render_reply(array $reply, $current_user_id, $topic_author_id = 0
     $author = forum_author_name($reply['author_name']);
     $is_owner = $current_user_id && (int) $reply['created_by'] === (int) $current_user_id;
 
+    $job_title = $reply ? $reply['job_title'] : '';
+    if($job_title == 'Untitled' || $job_title == 'null' || $job_title == null || $job_title == 'NULL' || $job_title == 'none' || $job_title == 'N/A' || $job_title == 'n/a') {
+        $job_title = '';
+    }
+
+    $role_id = $reply ? (int) $reply['role_id'] : null;
+    if($role_id == 0) {
+        $role_title = 'Team Member';
+    } else if (isset($role_id) && $role_id != null) {
+        $role_title = forum_get_role_title($role_id)['title'] ?? '';
+    }
+
     $html = '<article class="forum-reply" id="reply-' . (int) $reply['id'] . '" data-reply-id="' . (int) $reply['id'] . '">'
         . '<div class="forum-reply-avatar">' . forum_avatar($author) . '</div>'
         . '<div class="forum-reply-main">'
         . '<div class="forum-reply-head"><div class="forum-reply-who">'
         . '<span class="forum-reply-author">' . forum_e($author) . '</span>';
     if ($topic_author_id && (int) $reply['created_by'] === (int) $topic_author_id) {
-        $html .= '<span class="forum-tag">Author</span>';
+        $html .= '<span class="forum-tag">Admin</span>';
+    }
+    if( $job_title != '') {
+        $html .= '<span class="forum-tag forum-isAdmin-title">' . forum_e($job_title) . '</span>';
+    }
+    if( $role_title != '') {
+        $html .= '<span class="forum-tag forum-role-title">' . forum_e($role_title) . '</span>';
     }
     if ($is_owner) {
         $html .= '<span class="forum-tag forum-tag-you">You</span>';

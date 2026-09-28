@@ -219,6 +219,9 @@
     color: var(--forum-primary);
 }
 .forum-tag-you { background: #eef7f0; color: #3a9d4f; }
+.forum-job-title { background: #eaf3fb; color: #2b84d1; }
+.forum-isAdmin-title { background: #fdf0f2; color: #d9546a; }
+.forum-role-title { background: #f0f4f8; color: #8a939d; }
 
 .forum-avatar {
     display: inline-flex;
