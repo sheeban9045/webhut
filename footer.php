@@ -44,6 +44,20 @@
         <i class="pe-2x pe-7s-angle-up font-weight-bold"></i>
     </a>
 
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/6abb480760c27234400e7650/1k3lp2npi';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
+
     <script src="https://webhut.net/js/js-library/jquery-3.2.1.min.js"></script>
     <script src="https://webhut.net/js/js-library/bootstrap.min.js"></script>
 	<script src="https://webhut.net/js/js-library/twinlight.js"></script>
