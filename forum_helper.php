@@ -923,3 +923,12 @@ function forum_js_config() {
         'replyMaxLength' => FORUM_REPLY_MAX_LENGTH,
     ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) . ';</script>';
 }
+
+function forum_get_user_id_by_email($email) {
+    $row = forum_db_one(
+        "SELECT id FROM crm_users WHERE email = ? AND deleted = 0 LIMIT 1",
+        's',
+        array($email)
+    );
+    return $row ? (int) $row['id'] : 0;
+}

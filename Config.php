@@ -24,6 +24,8 @@ include("Database.php");
  } else {
      $baseURL = 'http://' . $domain;
  }
+
+define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
 ?>
 
 
