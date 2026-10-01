@@ -2,21 +2,32 @@
 <?php
 require_once './forum_helper.php';
 
-function contact_send_admin_notification($domain, $name, $email, $message) {
+function contact_send_admin_notification($domain, $name, $email, $message, $message_id) {
     $to = ADMIN_EMAIL;
+
     $subject = 'New Contact Us enquiry from ' . $name;
+
     $body = "You have received a new enquiry through the WebHut Contact Us form.\r\n\r\n"
         . "Name: $name\r\n"
         . "Email: $email\r\n\r\n"
         . "Message:\r\n$message\r\n";
 
-    $from_domain = preg_replace('/[^a-z0-9.\-]/i', '', $domain ?: 'webhut.net');
-    $headers = "From: WebHut Website <no-reply@$from_domain>\r\n"
+    $from_domain = preg_replace(
+        '/[^a-z0-9.\-]/i',
+        '',
+        $domain ?: 'webhut.net'
+    );
+
+    $headers =
+        "From: WebHut Website <no-reply@$from_domain>\r\n"
         . "Reply-To: $name <$email>\r\n"
+        . "Message-ID: $message_id\r\n"
         . "Content-Type: text/plain; charset=UTF-8\r\n";
 
     if (!@mail($to, $subject, $body, $headers)) {
-        error_log('Contact Us: failed to send admin notification email for ' . $email);
+        error_log(
+            'Contact Us: failed to send admin notification email for ' . $email
+        );
     }
 }
 
@@ -97,16 +108,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             );
 
             if ($stmt->execute()) {
+
+                $enquiry_id = $conn->insert_id;
+
                 $stmt->close();
+
+                // $email_host = parse_url(
+                //     $domain ?: 'https://webhut.net',
+                //     PHP_URL_HOST
+                // );
+
+                // if (!$email_host) {
+                //     $email_host = preg_replace(
+                //         '/[^a-z0-9.\-]/i',
+                //         '',
+                //         $domain ?: 'webhut.net'
+                //     );
+                // }
+
+                $email_host = 'webhut.net';
+                $email_message_id = '<enquiry-' . $enquiry_id . '@' . $email_host . '>';
+
+                // Save Message-ID against this enquiry
+                $update_stmt = $conn->prepare("
+                    UPDATE crm_messages
+                    SET email_message_id = ?
+                    WHERE id = ?
+                ");
+
+                if ($update_stmt) {
+                    $update_stmt->bind_param(
+                        "si",
+                        $email_message_id,
+                        $enquiry_id
+                    );
+
+                    $update_stmt->execute();
+                    $update_stmt->close();
+                }
 
                 contact_send_admin_notification(
                     $domain,
                     $contact_old['name'],
                     $contact_old['email'],
-                    $contact_old['message']
+                    $contact_old['message'],
+                    $email_message_id
                 );
 
-                // Redirect so refreshing the confirmation page never re-submits the form
                 header('Location: contact.php?status=success');
                 exit;
             }
