@@ -36,12 +36,20 @@ $contact_old = array('name' => '', 'email' => '', 'message' => '');
 $contact_success = isset($_GET['status']) && $_GET['status'] === 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
+    $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
     $contact_old['name'] = trim((string) ($_POST['name'] ?? ''));
     $contact_old['email'] = trim((string) ($_POST['email'] ?? ''));
     $contact_old['message'] = trim((string) ($_POST['message'] ?? ''));
 
+    // Strip tags for security against XSS/HTML injection
+    $contact_old['name'] = strip_tags($contact_old['name']);
+    $contact_old['message'] = strip_tags($contact_old['message']);
+
     if ($contact_old['name'] === '') {
         $contact_errors[] = 'Please enter your name.';
+    } else if (!preg_match('/^[a-zA-Z\s]+$/', $contact_old['name'])) {
+        $contact_errors[] = 'Name must contain only letters and spaces.';
     } else if (mb_strlen($contact_old['name']) > 150) {
         $contact_errors[] = 'Name must be at most 150 characters long.';
     }
@@ -56,6 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
 
     if ($contact_old['message'] === '') {
         $contact_errors[] = 'Please enter your message.';
+    } else if (mb_strlen($contact_old['message']) < 10) {
+        $contact_errors[] = 'Message must be at least 10 characters long.';
+    } else if (mb_strlen($contact_old['message']) > 2000) {
+        $contact_errors[] = 'Message must be at most 2000 characters long.';
     }
 
     if (!$contact_errors) {
@@ -155,6 +167,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                     $email_message_id
                 );
 
+                if ($is_ajax) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Thank you! Your message has been sent successfully. We will get back to you soon.'
+                    ]);
+                    exit;
+                }
+
                 header('Location: contact.php?status=success');
                 exit;
             }
@@ -167,8 +188,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             $contact_errors[] = 'Sorry, something went wrong. Please try again.';
         }
     }
+
+    if ($is_ajax) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => $contact_errors[0] ?? 'Sorry, something went wrong. Please try again.'
+        ]);
+        exit;
+    }
 }
 ?>
+<style>
+    div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){
+        background: #2b84d1 !important;
+        border: none !important;
+        outline: none !important;
+    }
+</style>
 <!--header-->
 <?php require './header.php';?>
 
@@ -202,19 +239,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                             <?php } ?>
                         </div>
                     <?php } ?>
-                    <form method="post" class="co_contact" action="contact.php">
+                    <form method="post" id="contactForm" class="co_contact" action="contact.php">
                         <div class="row">
                             <div class="form-group col-sm-12">
-                                <input type="text" name="name" class="form-control" placeholder="Your Name" maxlength="150" value="<?php echo htmlspecialchars($contact_old['name']); ?>" required>
+                                <input type="text" name="name" class="form-control" placeholder="Your Name" maxlength="150" pattern="[a-zA-Z\s]+" title="Name must contain only letters and spaces." value="<?php echo htmlspecialchars($contact_old['name']); ?>" required>
                             </div>
                             <div class="form-group col-sm-12">
                                 <input type="email" name="email" class="form-control" placeholder="Your Email" maxlength="255" value="<?php echo htmlspecialchars($contact_old['email']); ?>" required>
                             </div>
                         </div>
-                        <textarea class="form-control" name="message" placeholder="Your Message" required><?php echo htmlspecialchars($contact_old['message']); ?></textarea>
+                        <textarea class="form-control" name="message" placeholder="Your Message" minlength="10" maxlength="200" required><?php echo htmlspecialchars($contact_old['message']); ?></textarea>
                         <br>
                         <div class="form-group">
-                            <button type="submit" name="contact_submit" value="1" class="btn btn-xl btn-block btn-primary">Send Message</button>
+                            <button type="submit" name="contact_submit" value="1" id="contactSubmitBtn" class="btn btn-xl btn-block btn-primary">Send Message</button>
                         </div>
                     </form>
                 </div>
@@ -251,6 +288,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             </div>
         </div>
     </div>
-</div>
+</div><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('contactSubmitBtn');
+
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Client-side name validation
+            const nameField = contactForm.querySelector('input[name="name"]');
+            const nameRegex = /^[a-zA-Z\s]+$/;
+            if (!nameRegex.test(nameField.value.trim())) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Name must contain only letters and spaces.'
+                });
+                return;
+            }
+
+            // Client-side length validation
+            const messageField = contactForm.querySelector('textarea[name="message"]');
+            if (messageField.value.trim().length < 10) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Message must be at least 10 characters long.'
+                });
+                return;
+            }
+
+            if (messageField.value.trim().length > 200) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Message must be at most 200 characters long.'
+                });
+                return;
+            }
+
+            const formData = new FormData(contactForm);
+            // Append the button value since it's required by PHP
+            formData.append('contact_submit', '1');
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            fetch('contact.php', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message
+                    });
+                    contactForm.reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Something went wrong. Please try again.'
+                    });
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'A network error occurred. Please try again.'
+                });
+            });
+        });
+    }
+});
+</script>
 
 <?php require './footer.php' ?>
