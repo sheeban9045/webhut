@@ -3,8 +3,7 @@
 require_once './forum_helper.php';
 
 function contact_send_admin_notification($domain, $name, $email, $message, $message_id) {
-    $to = ADMIN_EMAIL;
-
+    $to = get_admin_email();
     $subject = 'New Contact Us enquiry from ' . $name;
 
     $body = "You have received a new enquiry through the WebHut Contact Us form.\r\n\r\n"
@@ -71,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
     }
 
     if (!$contact_errors) {
-        $admin_id = forum_get_user_id_by_email(ADMIN_EMAIL);
+        $admin_email = get_admin_email();
+        $admin_id = get_user_id_by_email($admin_email);
 
         // Store timestamp in UTC, same as CRM
         $created_at = gmdate('Y-m-d H:i:s');
