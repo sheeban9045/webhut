@@ -69,8 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         $contact_errors[] = 'Message must be at most 2000 characters long.';
     }
 
+    $admin_email = get_admin_email();
+    if (empty($admin_email)) {
+        $contact_errors[] = 'Something went wrong. Please contact support.';
+    }
     if (!$contact_errors) {
-        $admin_email = get_admin_email();
         $admin_id = get_user_id_by_email($admin_email);
 
         // Store timestamp in UTC, same as CRM
