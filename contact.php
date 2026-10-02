@@ -124,7 +124,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                 from_user_id,
                 message_id,
                 deleted,
-                files
+                files,
+                deleted_by_users
             )
             VALUES
             (
@@ -139,7 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                 0,
                 0,
                 0,
-                'a:0:{}'
+                'a:0:{}',
+                ''
             )
         ");
 
