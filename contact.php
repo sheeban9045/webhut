@@ -1,33 +1,64 @@
 <?php require './Config.php';?>
 <?php
 require_once './forum_helper.php';
+require_once './mailer.php';
+
+function contact_clean_header($value) {
+    return trim(preg_replace('/[\r\n]+/', ' ', (string) $value));
+}
+
+function contact_send_mail($to, $subject, $body, $opts, $log_label) {
+    if (!smtp_send_mail($to, $subject, $body, $opts)) {
+        error_log('Contact Us: failed to send ' . $log_label . ' email to ' . $to);
+        return false;
+    }
+    return true;
+}
 
 function contact_send_admin_notification($domain, $name, $email, $message, $message_id) {
-    $to = get_admin_email();
-    $subject = 'New Contact Us enquiry from ' . $name;
+    $to   = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : '';
+    $from = get_admin_email();
 
+    if (!$to) {
+        error_log('Contact Us: ADMIN_EMAIL is not defined');
+        return false;
+    }
+
+    $name  = contact_clean_header($name);
+    $email = contact_clean_header($email);
+
+    $subject = 'New Contact Us enquiry from ' . $name;
     $body = "You have received a new enquiry through the WebHut Contact Us form.\r\n\r\n"
         . "Name: $name\r\n"
         . "Email: $email\r\n\r\n"
         . "Message:\r\n$message\r\n";
 
-    $from_domain = preg_replace(
-        '/[^a-z0-9.\-]/i',
-        '',
-        $domain ?: 'webhut.net'
-    );
+    return contact_send_mail($to, $subject, $body, array(
+        'from_email' => $from,
+        'from_name'  => 'WebHut Website',
+        'reply_to'   => $email,
+        'reply_name' => $name,
+        'message_id' => $message_id,
+    ), 'admin notification');
+}
 
-    $headers =
-        "From: WebHut Website <no-reply@$from_domain>\r\n"
-        . "Reply-To: $name <$email>\r\n"
-        . "Message-ID: $message_id\r\n"
-        . "Content-Type: text/plain; charset=UTF-8\r\n";
+function contact_send_user_thankyou($domain, $name, $email, $message, $message_id) {
+    $from  = get_admin_email();
+    $name  = contact_clean_header($name);
+    $email = contact_clean_header($email);
 
-    if (!@mail($to, $subject, $body, $headers)) {
-        error_log(
-            'Contact Us: failed to send admin notification email for ' . $email
-        );
-    }
+    $subject = 'Thank you for contacting WebHut';
+    $body = "Hi $name,\r\n\r\n"
+        . "Thank you for contacting WebHut. We have received your message and our team will get back to you soon.\r\n\r\n"
+        . "Your message:\r\n$message\r\n\r\n"
+        . "Regards,\r\nWebHut Team\r\n";
+
+    return contact_send_mail($email, $subject, $body, array(
+        'from_email' => $from,
+        'from_name'  => 'WebHut',
+        'reply_to'   => $from,
+        'message_id' => $message_id,
+    ), 'user thank-you');
 }
 
 $contact_errors = array();
@@ -143,6 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
 
                 $email_host = 'webhut.net';
                 $email_message_id = '<enquiry-' . $enquiry_id . '@' . $email_host . '>';
+                $user_message_id  = '<enquiry-' . $enquiry_id . '-user@' . $email_host . '>';
 
                 // Save Message-ID against this enquiry
                 $update_stmt = $conn->prepare("
@@ -168,6 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                     $contact_old['email'],
                     $contact_old['message'],
                     $email_message_id
+                );
+
+                contact_send_user_thankyou(
+                    $domain,
+                    $contact_old['name'],
+                    $contact_old['email'],
+                    $contact_old['message'],
+                    $user_message_id
                 );
 
                 if ($is_ajax) {
@@ -251,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                                 <input type="email" name="email" class="form-control" placeholder="Your Email" maxlength="255" value="<?php echo htmlspecialchars($contact_old['email']); ?>" required>
                             </div>
                         </div>
-                        <textarea class="form-control" name="message" placeholder="Your Message" minlength="10" maxlength="200" required><?php echo htmlspecialchars($contact_old['message']); ?></textarea>
+                        <textarea class="form-control" name="message" placeholder="Your Message" minlength="10" maxlength="2000" required><?php echo htmlspecialchars($contact_old['message']); ?></textarea>
                         <br>
                         <div class="form-group">
                             <button type="submit" name="contact_submit" value="1" id="contactSubmitBtn" class="btn btn-xl btn-block btn-primary">Send Message</button>
@@ -273,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             <ul class="contact-list pl-0 pt-5">
                <li><a href="#"><i class="pe-7s-map-marker"></i> Lorem Ipsum? dolor sit</a></li>
                <li><a href="#"><i class="pe-7s-mail"></i> abc@example.com</a></li>
-              <li><a href="#"><i class="pe-7s-phone"></i> +1 123456789</a>
+               <li><a href="#"><i class="pe-7s-phone"></i> +1 123456789</a></li>
             </ul>
 
 
@@ -324,11 +364,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            if (messageField.value.trim().length > 200) {
+            if (messageField.value.trim().length > 2000) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Message must be at most 200 characters long.'
+                    text: 'Message must be at most 2000 characters long.'
                 });
                 return;
             }

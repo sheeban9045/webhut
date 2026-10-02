@@ -25,7 +25,16 @@ include("Database.php");
      $baseURL = 'http://' . $domain;
  }
 
-define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
+define('ADMIN_EMAIL', 'sheebanhasan7@gmail.com');
+// define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
+
+define('SMTP_HOST', 'smtp-relay.brevo.com');
+define('SMTP_PORT', 2525);
+define('SMTP_SECURE', 'tls');
+define('SMTP_USER', 'bc0c37001@smtp-brevo.com');
+define('SMTP_PASS', 'YOUR_BREVO_SMTP_KEY');
+define('SMTP_FROM_EMAIL', 'support@webhut.net');
+define('SMTP_FROM_NAME', 'WebHut');
 ?>
 
 
