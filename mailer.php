@@ -25,9 +25,9 @@ function smtp_send_mail($to, $subject, $body, $opts = array()) {
         if (!empty($opts['reply_to'])) {
             $mail->addReplyTo($opts['reply_to'], $opts['reply_name'] ?? '');
         }
-        if (!empty($opts['message_id'])) {
-            $mail->MessageID = $opts['message_id'];
-        }
+        // if (!empty($opts['message_id'])) {
+        //     $mail->MessageID = $opts['message_id'];
+        // }
         if (!empty($opts['in_reply_to'])) {
             $mail->addCustomHeader('In-Reply-To', $opts['in_reply_to']);
             $mail->addCustomHeader('References', $opts['references'] ?? $opts['in_reply_to']);
