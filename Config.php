@@ -25,8 +25,7 @@ include("Database.php");
      $baseURL = 'http://' . $domain;
  }
 
-define('ADMIN_EMAIL', 'sheebanhasan7@gmail.com');
-// define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
+define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
 
 define('COMPANY_NAME', 'WebHut');
 define('COMPANY_EMAIL', 'friendsforlife28@gmail.com');
