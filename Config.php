@@ -28,6 +28,13 @@ include("Database.php");
 define('ADMIN_EMAIL', 'sheebanhasan7@gmail.com');
 // define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
 
+define('COMPANY_NAME', 'WebHut');
+define('COMPANY_EMAIL', 'friendsforlife28@gmail.com');
+define('COMPANY_PHONE', '+1 123456789');
+define('COMPANY_WEBSITE', 'https://webhut.net');
+define('ADMIN_NAME', 'Matt');
+
+
 define('SMTP_HOST', 'smtp-relay.brevo.com');
 define('SMTP_PORT', 2525);
 define('SMTP_SECURE', 'tls');

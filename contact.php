@@ -24,18 +24,38 @@ function contact_send_admin_notification($domain, $name, $email, $message, $mess
         return false;
     }
 
-    $name  = contact_clean_header($name);
-    $email = contact_clean_header($email);
+    $name    = contact_clean_header($name);
+    $email   = contact_clean_header($email);
+    $message = trim((string) $message);
 
-    $subject = 'New Contact Us enquiry from ' . $name;
-    $body = "You have received a new enquiry through the WebHut Contact Us form.\r\n\r\n"
+    $admin_name = defined('ADMIN_NAME') ? ADMIN_NAME : 'Admin';
+
+    $company_name    = defined('COMPANY_NAME') ? COMPANY_NAME : '';
+    $company_email   = defined('COMPANY_EMAIL') ? COMPANY_EMAIL : '';
+    $company_phone   = defined('COMPANY_PHONE') ? COMPANY_PHONE : '';
+    $company_website = defined('COMPANY_WEBSITE') ? COMPANY_WEBSITE : '';
+
+    $submitted_at = (new DateTime('now', forum_timezone()))->format('Y-m-d H:i:s');
+
+    $subject = 'New Customer Query Received — ' . $name;
+
+    $body = "Hello $admin_name,\r\n\r\n"
+        . "You have received a new query through the website contact form.\r\n\r\n"
+        . "Customer Details\r\n\r\n"
         . "Name: $name\r\n"
-        . "Email: $email\r\n\r\n"
-        . "Message:\r\n$message\r\n";
+        . "Email: $email\r\n"
+        . "Date & Time: $submitted_at\r\n\r\n"
+        . "Query:\r\n"
+        . "$message\r\n\r\n"
+        . "Please review the query and respond to the customer at your earliest convenience.\r\n\r\n"
+        . "Reply to Customer: $email\r\n\r\n"
+        . "Best regards,\r\n"
+        . "$company_name\r\n"
+        . "Website Contact Form\r\n";
 
     return contact_send_mail($to, $subject, $body, array(
         'from_email' => $from,
-        'from_name'  => 'WebHut Website',
+        'from_name'  => $company_name ?: 'Website',
         'reply_to'   => $email,
         'reply_name' => $name,
         'message_id' => $message_id,
@@ -43,20 +63,37 @@ function contact_send_admin_notification($domain, $name, $email, $message, $mess
 }
 
 function contact_send_user_thankyou($domain, $name, $email, $message, $message_id) {
-    $from  = get_admin_email();
-    $name  = contact_clean_header($name);
-    $email = contact_clean_header($email);
+    $from = get_admin_email();
 
-    $subject = 'Thank you for contacting WebHut';
-    $body = "Hi $name,\r\n\r\n"
-        . "Thank you for contacting WebHut. We have received your message and our team will get back to you soon.\r\n\r\n"
-        . "Your message:\r\n$message\r\n\r\n"
-        . "Regards,\r\nWebHut Team\r\n";
+    $reply_to = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : '';
+
+    $name    = contact_clean_header($name);
+    $email   = contact_clean_header($email);
+    $message = trim((string) $message);
+
+    $company_name    = defined('COMPANY_NAME') ? COMPANY_NAME : '';
+    $company_email   = defined('COMPANY_EMAIL') ? COMPANY_EMAIL : '';
+    $company_phone   = defined('COMPANY_PHONE') ? COMPANY_PHONE : '';
+    $company_website = defined('COMPANY_WEBSITE') ? COMPANY_WEBSITE : '';
+
+    $subject = 'Thank You for Contacting Us';
+
+    $body = "Dear $name,\r\n\r\n"
+        . "Thank you for contacting us.\r\n\r\n"
+        . "We have successfully received your query and our team will review it and get back to you as soon as possible.\r\n\r\n"
+        . "Your Query:\r\n"
+        . "$message\r\n\r\n"
+        . "If you have any additional information that may help us assist you, please feel free to reply to this email.\r\n\r\n"
+        . "Best regards,\r\n"
+        . "$company_name\r\n"
+        . "$company_email\r\n"
+        . "$company_phone\r\n"
+        . "$company_website\r\n";
 
     return contact_send_mail($email, $subject, $body, array(
         'from_email' => $from,
-        'from_name'  => 'WebHut',
-        'reply_to'   => $from,
+        'from_name'  => $company_name ?: 'Website',
+        'reply_to'   => $reply_to,
         'message_id' => $message_id,
     ), 'user thank-you');
 }
