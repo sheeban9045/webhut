@@ -19,6 +19,7 @@ if ($topic) {
     $moreTopics = forum_get_topics(' AND t.category_id = ? AND t.id <> ?', 'ii', array((int) $topic['category_id'], $topicId), 5);
     $author = forum_author_name($topic['author_name']);
     $role_title = $topic['role_title'] ? $topic['role_title'] : '';
+    $role_color = $topic['role_color'] ? $topic['role_color'] : '';
 } else {
     http_response_code(404);
 }
@@ -58,9 +59,13 @@ require './header.php';
                                 <span class="forum-post-author">
                                     <?php echo forum_e($author); ?> 
                                     <?php if ($isAdmin) { echo '<span class="forum-tag forum-isAdmin-title">Admin</span>'; } ?> 
-                                    <?php if ($job_title) { echo '<span class="forum-tag forum-job-title">' . forum_e($job_title) . '</span>'; } ?> 
-                                    <?php if ($role_title) { echo '<span class="forum-tag forum-role-title">' . forum_e($role_title) . '</span>'; } ?> 
-                                    <?php if ($currentUserId && (int) $topic['created_by'] === $currentUserId) { ?><span class="forum-tag forum-tag-you">You</span><?php } ?></span>
+                                    <?php if ($job_title) { echo '<span class="forum-tag forum-job-title" style="color: #7E22CE;background: #7E22CE1A">' . forum_e($job_title) . '</span>'; } ?> 
+                                    <?php if (isset($role_title) && $role_title == "Team Member") { 
+                                        echo '<span class="forum-tag forum-role-title">' . forum_e($role_title) . '</span>'; 
+                                    } else if(isset($role_title)) {
+                                        echo '<span class="forum-tag forum-role-title" style="color:' . $role_color . '; background:' . $role_color . '1A;">' . forum_e($role_title) . '</span>'; 
+                                    } ?> 
+                                    <!-- <?php // if ($currentUserId && (int) $topic['created_by'] === $currentUserId) { ?><span class="forum-tag forum-tag-you">You</span><?php // } ?></span> -->
                                 <span class="forum-post-date">Posted <?php echo forum_time_html($topic['created_at']); ?> &middot; <?php echo forum_e(forum_format_date($topic['created_at'])); ?></span>
                             </div>
                         </div>

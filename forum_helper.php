@@ -463,7 +463,11 @@ function forum_get_topic($topic_id) {
             CASE
                 WHEN u.role_id = 0 THEN 'Team Member'
                 ELSE r.title
-            END AS role_title
+            END AS role_title,
+            CASE
+                WHEN u.role_id = 0 THEN ''
+                ELSE r.color
+            END AS role_color
          FROM crm_forum_topics t
          INNER JOIN crm_forum_categories c ON c.id = t.category_id AND c.deleted = 0
          LEFT JOIN crm_users u ON u.id = t.created_by
@@ -488,7 +492,7 @@ function forum_get_topic_replies($topic_id) {
 
 function forum_get_role_title($role_id) {
     return forum_db_one(
-        "SELECT title FROM crm_roles WHERE id = ?",
+        "SELECT title, color FROM crm_roles WHERE id = ?",
         'i',
         array((int) $role_id)
     );
@@ -857,8 +861,12 @@ function forum_render_reply(array $reply, $current_user_id, $topic_author_id = 0
     $role_id = $reply ? (int) $reply['role_id'] : null;
     if($role_id == 0) {
         $role_title = 'Team Member';
+        $role_style = '';
     } else if (isset($role_id) && $role_id != null) {
-        $role_title = forum_get_role_title($role_id)['title'] ?? '';
+        $roleDetails = forum_get_role_title($role_id) ?? [];
+        $role_title = $roleDetails['title'] ?? '';
+        $role_color = $roleDetails['color'] ?? '#8a939d';
+        $role_style = 'color:' . $role_color . ';background:' . $role_color . '1A;';
     }
 
     $html = '<article class="forum-reply" id="reply-' . (int) $reply['id'] . '" data-reply-id="' . (int) $reply['id'] . '">'
@@ -867,17 +875,17 @@ function forum_render_reply(array $reply, $current_user_id, $topic_author_id = 0
         . '<div class="forum-reply-head"><div class="forum-reply-who">'
         . '<span class="forum-reply-author">' . forum_e($author) . '</span>';
     if ($is_admin) {
-        $html .= '<span class="forum-tag">Admin</span>';
+        $html .= '<span class="forum-tag forum-isAdmin-title">Admin</span>';
     }
     if( $job_title != '') {
-        $html .= '<span class="forum-tag forum-isAdmin-title">' . forum_e($job_title) . '</span>';
+        $html .= '<span class="forum-tag forum-isAdmin-title" style="color: #7E22CE;background: #7E22CE1A">' . forum_e($job_title) . '</span>';
     }
     if( $role_title != '') {
-        $html .= '<span class="forum-tag forum-role-title">' . forum_e($role_title) . '</span>';
+        $html .= '<span class="forum-tag forum-role-title" style="' . $role_style . '">' . forum_e($role_title) . '</span>';
     }
-    if ($is_owner) {
-        $html .= '<span class="forum-tag forum-tag-you">You</span>';
-    }
+    // if ($is_owner) {
+    //     $html .= '<span class="forum-tag forum-tag-you">You</span>';
+    // }
     $html .= '<a class="forum-reply-time" href="#reply-' . (int) $reply['id'] . '">' . forum_time_html($reply['created_at']) . '</a></div>';
     if ($is_owner) {
         $html .= '<div class="forum-reply-actions">'
