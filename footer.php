@@ -29,9 +29,9 @@
                  <div class="col-sm-3">
                     <h6 class="display_6">Our Place</h6>
                     <ul class="list-unstyled footer-links ml-1">
-                        <li><a href="javascript:void(0);"><i class="pe-7s-map-marker" style="color: #ffffff;"></i> Lorem Ipsum? dolor sit</a></li>
-                        <li><a href="#"><i class="pe-7s-mail" style="color: #ffffff;"></i> abc@example.com</a></li>
-                        <li><a href="#"><i class="pe-7s-phone" style="color: #ffffff;"></i> +91 9876543210</a></li>
+                        <li><a href="javascript:void(0);"><i class="fa fa-map-marker" style="color: #ffffff;"></i> Lorem Ipsum? dolor sit</a></li>
+                        <li><a href="#"><i class="fa fa-envelope" style="color: #ffffff;"></i> support@webhut.net</a></li>
+                        <li><a href="#"><i class="fa fa-phone" style="color: #ffffff;"></i> +91 9876543210</a></li>
                     </ul>
                 </div>
 

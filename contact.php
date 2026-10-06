@@ -2,6 +2,7 @@
 <?php
 require_once './forum_helper.php';
 require_once './mailer.php';
+require_once './recaptcha.php';
 
 function contact_clean_header($value) {
     return trim(preg_replace('/[\r\n]+/', ' ', (string) $value));
@@ -135,6 +136,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         $contact_errors[] = 'Message must be at least 10 characters long.';
     } else if (mb_strlen($contact_old['message']) > 2000) {
         $contact_errors[] = 'Message must be at most 2000 characters long.';
+    }
+
+    // CAPTCHA must be verified server-side; a missing/invalid token blocks submission
+    // even if the client-side check was bypassed.
+    if (!$contact_errors) {
+        $recaptcha_token = trim((string) ($_POST['g-recaptcha-response'] ?? ''));
+        if ($recaptcha_token === '') {
+            $contact_errors[] = 'Please complete the CAPTCHA verification.';
+        } else if (!verify_recaptcha($recaptcha_token, $_SERVER['REMOTE_ADDR'] ?? null)) {
+            $contact_errors[] = 'CAPTCHA verification failed. Please try again.';
+        }
     }
 
     $admin_email = get_admin_email();
@@ -333,6 +345,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                         <textarea class="form-control" name="message" placeholder="Your Message" minlength="10" maxlength="2000" required><?php echo htmlspecialchars($contact_old['message']); ?></textarea>
                         <br>
                         <div class="form-group">
+                            <div class="g-recaptcha" id="contactRecaptcha" data-sitekey="<?php echo htmlspecialchars(RECAPTCHA_SITE_KEY); ?>"></div>
+                        </div>
+                        <div class="form-group">
                             <button type="submit" name="contact_submit" value="1" id="contactSubmitBtn" class="btn btn-xl btn-block btn-primary">Send Message</button>
                         </div>
                     </form>
@@ -350,9 +365,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
               <img src="images/contact.png" alt="Address" title="Address" class="img-responsive">
             </div>
             <ul class="contact-list pl-0 pt-5">
-               <li><a href="#"><i class="pe-7s-map-marker"></i> Lorem Ipsum? dolor sit</a></li>
-               <li><a href="#"><i class="pe-7s-mail"></i> abc@example.com</a></li>
-               <li><a href="#"><i class="pe-7s-phone"></i> +1 123456789</a></li>
+               <li><a href="#"><i class="fa fa-map-marker"></i> Lorem Ipsum? dolor sit</a></li>
+               <li><a href="#"><i class="fa fa-envelope"></i> support@webhut.net</a></li>
+               <li><a href="#"><i class="fa fa-phone"></i> +1 123456789</a></li>
             </ul>
 
 
@@ -371,6 +386,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         </div>
     </div>
 </div><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contactForm');
@@ -412,6 +428,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Client-side CAPTCHA check (server-side verification is still mandatory below)
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse().length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please complete the CAPTCHA verification.'
+                });
+                return;
+            }
+
             const formData = new FormData(contactForm);
             // Append the button value since it's required by PHP
             formData.append('contact_submit', '1');
@@ -432,6 +458,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Message';
 
+                // A reCAPTCHA token can only be verified once, always reset after a server round-trip
+                if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                }
+
                 if (data.success) {
                     Swal.fire({
                         icon: 'success',
@@ -450,6 +481,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Message';
+                if (typeof grecaptcha !== 'undefined') {
+                    grecaptcha.reset();
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
