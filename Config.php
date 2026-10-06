@@ -1,9 +1,6 @@
 <?php
-// echo "<pre>";
-// print_r($_SERVER);
-// die;
-
 error_reporting(1);
+require_once __DIR__ . '/env.php';
 include("Database.php");
      
  $domain = $_SERVER['HTTP_HOST'];
@@ -12,7 +9,6 @@ include("Database.php");
  
  $data = mysqli_query($conn, "SELECT Count(id) as count from crm_orders where domain_name='".$domain."'");
  $data = mysqli_fetch_assoc($data);
- //print_r($data);die;
     
  if(false && strcmp($domain, "www.webhut.net") !=0  && $data['count'] == 0 ){
      
@@ -25,22 +21,26 @@ include("Database.php");
      $baseURL = 'http://' . $domain;
  }
 
-define('ADMIN_EMAIL', 'friendsforlife28@gmail.com');
+// All values below come from .env (see env.php / .env.example) and must not be hardcoded here.
+define('ADMIN_EMAIL', env('ADMIN_EMAIL', ''));
 
-define('COMPANY_NAME', 'WebHut');
-define('COMPANY_EMAIL', 'friendsforlife28@gmail.com');
-define('COMPANY_PHONE', '+1 123456789');
-define('COMPANY_WEBSITE', 'https://webhut.net');
-define('ADMIN_NAME', 'Matt');
+define('COMPANY_NAME', env('COMPANY_NAME', ''));
+define('COMPANY_EMAIL', env('COMPANY_EMAIL', ''));
+define('COMPANY_PHONE', env('COMPANY_PHONE', ''));
+define('COMPANY_WEBSITE', env('COMPANY_WEBSITE', ''));
+define('ADMIN_NAME', env('ADMIN_NAME', ''));
 
 
-define('SMTP_HOST', 'smtp-relay.brevo.com');
-define('SMTP_PORT', 2525);
-define('SMTP_SECURE', 'tls');
-define('SMTP_USER', 'bc0c37001@smtp-brevo.com');
-define('SMTP_PASS', 'YOUR_BREVO_SMTP_KEY');
-define('SMTP_FROM_EMAIL', 'support@webhut.net');
-define('SMTP_FROM_NAME', 'WebHut');
+define('SMTP_HOST', env('SMTP_HOST', ''));
+define('SMTP_PORT', (int) env('SMTP_PORT', 587));
+define('SMTP_SECURE', env('SMTP_SECURE', 'tls'));
+define('SMTP_USER', env('SMTP_USER', ''));
+define('SMTP_PASS', env('SMTP_PASS', ''));
+define('SMTP_FROM_EMAIL', env('SMTP_FROM_EMAIL', ''));
+define('SMTP_FROM_NAME', env('SMTP_FROM_NAME', ''));
+
+define('RECAPTCHA_SITE_KEY', env('RECAPTCHA_SITE_KEY', ''));
+define('RECAPTCHA_SECRET_KEY', env('RECAPTCHA_SECRET_KEY', ''));
 ?>
 
 
