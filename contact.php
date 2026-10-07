@@ -3,6 +3,7 @@
 require_once './forum_helper.php';
 require_once './mailer.php';
 require_once './recaptcha.php';
+require_once './services_helper.php';
 
 function contact_clean_header($value) {
     return trim(preg_replace('/[\r\n]+/', ' ', (string) $value));
@@ -16,7 +17,9 @@ function contact_send_mail($to, $subject, $body, $opts, $log_label) {
     return true;
 }
 
-function contact_send_admin_notification($domain, $name, $email, $message, $message_id) {
+//$subject_override lets a Service enquiry (see services_helper.php) use its own subject
+//(e.g. "Service Inquiry: Custom Plugin Development") instead of the normal Contact Us subject
+function contact_send_admin_notification($domain, $name, $email, $message, $message_id, $subject_override = null) {
     $to   = defined('ADMIN_EMAIL') ? ADMIN_EMAIL : '';
     $from = get_admin_email();
 
@@ -38,7 +41,7 @@ function contact_send_admin_notification($domain, $name, $email, $message, $mess
 
     $submitted_at = (new DateTime('now', forum_timezone()))->format('Y-m-d H:i:s');
 
-    $subject = 'New Customer Query Received — ' . $name;
+    $subject = $subject_override !== null ? $subject_override : ('New Customer Query Received — ' . $name);
 
     $body = "Hello $admin_name,\r\n\r\n"
         . "You have received a new query through the website contact form.\r\n\r\n"
@@ -100,8 +103,20 @@ function contact_send_user_thankyou($domain, $name, $email, $message, $message_i
 }
 
 $contact_errors = array();
-$contact_old = array('name' => '', 'email' => '', 'message' => '');
+$contact_old = array('name' => '', 'email' => '', 'message' => '', 'service_slug' => '');
 $contact_success = isset($_GET['status']) && $_GET['status'] === 'success';
+
+// Coming from a service's "Get a Quote" link (services.php/service-details.php): pre-fill
+// the message and remember which service this is about via the hidden "service_slug" field,
+// so the submission can use a dedicated "Service Inquiry: ..." subject. Only applies to the
+// initial page load, not a POST (the hidden field carries it across the actual submission).
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !empty($_GET['service'])) {
+    $prefill_service = services_get_by_slug($conn, $_GET['service']);
+    if ($prefill_service) {
+        $contact_old['message'] = 'I am interested in the "' . $prefill_service['title'] . '" service. Please share more details and pricing.';
+        $contact_old['service_slug'] = $prefill_service['slug'];
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
     $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
@@ -109,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
     $contact_old['name'] = trim((string) ($_POST['name'] ?? ''));
     $contact_old['email'] = trim((string) ($_POST['email'] ?? ''));
     $contact_old['message'] = trim((string) ($_POST['message'] ?? ''));
+    $contact_old['service_slug'] = trim((string) ($_POST['service_slug'] ?? ''));
 
     // Strip tags for security against XSS/HTML injection
     $contact_old['name'] = strip_tags($contact_old['name']);
@@ -159,6 +175,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         // Store timestamp in UTC, same as CRM
         $created_at = gmdate('Y-m-d H:i:s');
 
+        // Submissions coming from Services -> "Get a Quote" (services_contact_url()) carry a
+        // service_slug; resolved fresh from the DB (never trust the posted slug/title directly)
+        // so they get their own "Service Inquiry: ..." subject and the service name is recorded
+        // in the enquiry body. A missing/stale/invalid slug degrades gracefully to a normal
+        // Contact Us submission with its existing subject - it never blocks the submission.
+        $service_for_enquiry = $contact_old['service_slug'] !== '' ? services_get_by_slug($conn, $contact_old['service_slug']) : null;
+
+        $enquiry_subject_override = $service_for_enquiry ? ('Service Inquiry: ' . $service_for_enquiry['title']) : null;
+        $enquiry_message = $service_for_enquiry
+            ? ('Service: ' . $service_for_enquiry['title'] . "\n\n" . $contact_old['message'])
+            : $contact_old['message'];
+        $enquiry_db_subject = $enquiry_subject_override !== null ? $enquiry_subject_override : 'Enquiry from contact form';
+
         $stmt = $conn->prepare("
             INSERT INTO crm_messages
             (
@@ -178,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
             )
             VALUES
             (
-                'Enquiry from contact form',
+                ?,
                 ?,
                 ?,
                 ?,
@@ -197,10 +226,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
         if ($stmt) {
 
             $stmt->bind_param(
-                "ssss",
+                "sssss",
+                $enquiry_db_subject,
                 $contact_old['name'],
                 $contact_old['email'],
-                $contact_old['message'],
+                $enquiry_message,
                 $created_at
             );
 
@@ -249,15 +279,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                     $domain,
                     $contact_old['name'],
                     $contact_old['email'],
-                    $contact_old['message'],
-                    $email_message_id
+                    $enquiry_message,
+                    $email_message_id,
+                    $enquiry_subject_override
                 );
 
                 contact_send_user_thankyou(
                     $domain,
                     $contact_old['name'],
                     $contact_old['email'],
-                    $contact_old['message'],
+                    $enquiry_message,
                     $user_message_id
                 );
 
@@ -334,6 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['contact_submit'])) {
                         </div>
                     <?php } ?>
                     <form method="post" id="contactForm" class="co_contact" action="contact.php">
+                        <input type="hidden" name="service_slug" id="contactServiceSlug" value="<?php echo htmlspecialchars($contact_old['service_slug']); ?>">
                         <div class="row">
                             <div class="form-group col-sm-12">
                                 <input type="text" name="name" class="form-control" placeholder="Your Name" maxlength="150" pattern="[a-zA-Z\s]+" title="Name must contain only letters and spaces." value="<?php echo htmlspecialchars($contact_old['name']); ?>" required>
@@ -470,6 +502,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         text: data.message
                     });
                     contactForm.reset();
+                    // The hidden service_slug field would otherwise revert to its initial
+                    // (page-load) value on reset(); clear it so a second, unrelated message
+                    // sent without reloading the page isn't tagged with the old service.
+                    const serviceSlugField = document.getElementById('contactServiceSlug');
+                    if (serviceSlugField) {
+                        serviceSlugField.value = '';
+                    }
                 } else {
                     Swal.fire({
                         icon: 'error',
