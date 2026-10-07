@@ -53,6 +53,11 @@
     while ($row = mysqli_fetch_assoc($resultOneTime)) {
         $itemsOneTime[] = $row;
     }
+
+    // Our Services (homepage preview)
+    require_once './services_helper.php';
+    $homeServicesResult = services_get_active($conn, 3);
+    $homeServices = $homeServicesResult ? mysqli_fetch_all($homeServicesResult, MYSQLI_ASSOC) : array();
 ?>
 <style>
     .announcement-div::-webkit-scrollbar {
@@ -608,6 +613,71 @@
                                                     </div>
                                                     </div>
 
+                                                    <?php if ($homeServices) { ?>
+                                                    <style>
+                                                        .home-services-section .service-card {
+                                                            background: #fff;
+                                                            border-radius: 16px;
+                                                            padding: 32px 28px;
+                                                            height: 100%;
+                                                            box-shadow: 0 4px 18px rgba(20, 30, 60, 0.07);
+                                                            transition: transform 0.25s ease, box-shadow 0.25s ease;
+                                                        }
+                                                        .home-services-section .service-card:hover {
+                                                            transform: translateY(-6px);
+                                                            box-shadow: 0 14px 30px rgba(20, 30, 60, 0.12);
+                                                        }
+                                                        .home-services-section .service-icon {
+                                                            width: 60px;
+                                                            height: 60px;
+                                                            border-radius: 14px;
+                                                            background: rgba(43, 132, 209, 0.1);
+                                                            color: #2b84d1;
+                                                            display: flex;
+                                                            align-items: center;
+                                                            justify-content: center;
+                                                            font-size: 24px;
+                                                            margin-bottom: 18px;
+                                                        }
+                                                        .home-services-section .service-card h4 {
+                                                            font-weight: 600;
+                                                            margin-bottom: 10px;
+                                                        }
+                                                        .home-services-section .service-card p {
+                                                            color: #6b6a6a;
+                                                            font-size: 0.95rem;
+                                                        }
+                                                        .home-services-section .service-price {
+                                                            font-weight: 700;
+                                                            color: #2b84d1;
+                                                            margin-bottom: 14px;
+                                                        }
+                                                    </style>
+                                                    <div class="section home-services-section">
+                                                        <div class="container">
+                                                            <div class="section_title text-center">
+                                                                <h1 class="display_7">Our Services</h1>
+                                                                <p>A few of the ways our team can help you.</p>
+                                                            </div>
+                                                            <div class="row">
+                                                                <?php foreach ($homeServices as $homeService) { ?>
+                                                                    <div class="col-md-4 mb-4">
+                                                                        <div class="service-card">
+                                                                            <div class="service-icon"><i class="fa <?php echo htmlspecialchars(services_icon_class($homeService['icon'])); ?>"></i></div>
+                                                                            <h4><?php echo htmlspecialchars($homeService['title']); ?></h4>
+                                                                            <p><?php echo services_excerpt($homeService['short_description'], 100); ?></p>
+                                                                            <div class="service-price"><?php echo htmlspecialchars(services_format_price($homeService['price'], $homeService['price_type'])); ?></div>
+                                                                            <a href="<?php echo htmlspecialchars(services_detail_url($homeService['slug'])); ?>" class="btn btn-outline-primary">Learn More</a>
+                                                                        </div>
+                                                                    </div>
+                                                                <?php } ?>
+                                                            </div>
+                                                            <div class="text-center mt-3">
+                                                                <a href="services.php" class="btn btn-xl btn-primary">View All Services</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php } ?>
 
                                                     <!-- <div class="section bg_light py_lg co_stats" id="pricing">
                                                         <div class="container prel">
