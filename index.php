@@ -627,18 +627,21 @@
                                                             transform: translateY(-6px);
                                                             box-shadow: 0 14px 30px rgba(20, 30, 60, 0.12);
                                                         }
-                                                        .home-services-section .service-icon {
-                                                            width: 60px;
-                                                            height: 60px;
-                                                            border-radius: 14px;
+                                                        .home-services-section .service-thumb {
+                                                            width: 64px;
+                                                            height: 64px;
+                                                            border-radius: 50%;
                                                             background: rgba(43, 132, 209, 0.1);
                                                             color: #2b84d1;
+                                                            overflow: hidden;
                                                             display: flex;
                                                             align-items: center;
                                                             justify-content: center;
                                                             font-size: 24px;
                                                             margin-bottom: 18px;
                                                         }
+                                                        .home-services-section .service-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+                                                        .home-services-section .service-thumb.has-image i { display: none; }
                                                         .home-services-section .service-card h4 {
                                                             font-weight: 600;
                                                             margin-bottom: 10px;
@@ -663,9 +666,9 @@
                                                                 <?php foreach ($homeServices as $homeService) { ?>
                                                                     <div class="col-md-4 mb-4">
                                                                         <div class="service-card">
-                                                                            <div class="service-icon"><i class="fa <?php echo htmlspecialchars(services_icon_class($homeService['icon'])); ?>"></i></div>
+                                                                            <?php echo services_thumb_html(services_image_url($conn, $homeService['image']), $homeService['title']); ?>
                                                                             <h4><?php echo htmlspecialchars($homeService['title']); ?></h4>
-                                                                            <p><?php echo services_excerpt($homeService['short_description'], 100); ?></p>
+                                                                            <p><?php echo services_excerpt($homeService['description'], 100); ?></p>
                                                                             <div class="service-price"><?php echo htmlspecialchars(services_format_price($homeService['price'], $homeService['price_type'])); ?></div>
                                                                             <a href="<?php echo htmlspecialchars(services_detail_url($homeService['slug'])); ?>" class="btn btn-outline-primary">Learn More</a>
                                                                         </div>
