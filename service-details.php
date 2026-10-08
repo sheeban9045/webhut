@@ -39,19 +39,23 @@ if (!$service) {
     .service-detail-breadcrumb span { color: rgba(255,255,255,0.6); margin: 0 6px; }
     .service-detail-breadcrumb strong { color: #fff; }
 
-    .service-detail-icon {
+    .service-thumb.service-detail-thumb {
         position: relative;
-        width: 76px;
-        height: 76px;
+        width: 110px;
+        height: 110px;
         margin: 0 auto 20px;
-        border-radius: 18px;
+        border-radius: 50%;
         background: rgba(255,255,255,0.15);
+        border: 3px solid rgba(255,255,255,0.35);
         color: #fff;
+        overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
+        font-size: 40px;
     }
+    .service-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .service-thumb.has-image i { display: none; }
     .service-detail-hero h1 {
         position: relative;
         color: #fff;
@@ -105,7 +109,7 @@ if (!$service) {
             <span>/</span>
             <strong><?php echo htmlspecialchars($service['title']); ?></strong>
         </div>
-        <div class="service-detail-icon"><i class="fa <?php echo htmlspecialchars(services_icon_class($service['icon'])); ?>"></i></div>
+        <?php echo services_thumb_html(services_image_url($conn, $service['image']), $service['title'], 'service-detail-thumb'); ?>
         <h1><?php echo htmlspecialchars($service['title']); ?></h1>
         <div class="service-detail-price"><?php echo htmlspecialchars(services_format_price($service['price'], $service['price_type'])); ?></div>
     </div>
